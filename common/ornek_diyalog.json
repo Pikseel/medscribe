@@ -1,0 +1,77 @@
+{
+  "dialogue_id": "demo_001",
+  "source": "demo",
+  "reference_note": null,
+  "segments": [
+    {
+      "id": 0,
+      "start": null,
+      "end": null,
+      "speaker": "A",
+      "gold_role": "Doctor",
+      "role": null,
+      "role_prob": null,
+      "text": "Good morning, what brings you in today?"
+    },
+    {
+      "id": 1,
+      "start": null,
+      "end": null,
+      "speaker": "B",
+      "gold_role": "Patient",
+      "role": null,
+      "role_prob": null,
+      "text": "I've had a bad cough for about a week."
+    },
+    {
+      "id": 2,
+      "start": null,
+      "end": null,
+      "speaker": "A",
+      "gold_role": "Doctor",
+      "role": null,
+      "role_prob": null,
+      "text": "Do you have any fever or chest pain?"
+    },
+    {
+      "id": 3,
+      "start": null,
+      "end": null,
+      "speaker": "B",
+      "gold_role": "Patient",
+      "role": null,
+      "role_prob": null,
+      "text": "A little fever at night, but no chest pain."
+    },
+    {
+      "id": 4,
+      "start": null,
+      "end": null,
+      "speaker": "A",
+      "gold_role": "Doctor",
+      "role": null,
+      "role_prob": null,
+      "text": "Are you taking any medication for it?"
+    },
+    {
+      "id": 5,
+      "start": null,
+      "end": null,
+      "speaker": "B",
+      "gold_role": "Patient",
+      "role": null,
+      "role_prob": null,
+      "text": "Just some cough syrup from the pharmacy."
+    },
+    {
+      "id": 6,
+      "start": null,
+      "end": null,
+      "speaker": "A",
+      "gold_role": "Doctor",
+      "role": null,
+      "role_prob": null,
+      "text": "Okay, let me listen to your lungs first."
+    }
+  ]
+}

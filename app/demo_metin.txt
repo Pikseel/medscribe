@@ -1,0 +1,10 @@
+A: Good morning, what brings you in today?
+B: Hi doctor. I've had this headache for about five days now, mostly in the afternoon.
+A: Have you had any nausea, vomiting or changes in your vision?
+B: No vomiting, but sometimes the light bothers me.
+A: Are you taking anything for the pain?
+B: I take ibuprofen, around 400 milligrams, maybe twice a day.
+A: Any history of high blood pressure or migraines in your family?
+B: My mother had migraines, yes.
+A: Okay. Let me check your blood pressure, and I'd like you to keep a headache diary for two weeks.
+B: Sure, I can do that.
