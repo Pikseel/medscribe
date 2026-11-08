@@ -39,7 +39,12 @@ MODEL_OLLAMA = "qwen2.5:7b-instruct-q4_K_M"
 MODEL_HF = "Qwen/Qwen2.5-7B-Instruct"
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 TEMPERATURE = 0          # frozen: unchanged for the whole experiment
-MAX_NEW_TOKENS = 700
+MAX_NEW_TOKENS = 1500    # aci_003 needs ~900; 700 truncated its note mid-string
+RETRY_MAX_NEW_TOKENS = 2500
+
+# Sent only when the first reply is not parseable (usually truncation).
+RETRY_INSTRUCTION = (
+    "Reply with JSON only, keys S, O, A, P. Keep each value under 120 words.")
 
 
 def _detect_backend():
@@ -131,14 +136,14 @@ def build_messages(dialogue, role_field):
 # Model call — the only backend-dependent part
 # --------------------------------------------------------------------------
 
-def _chat_ollama(messages, timeout=900):
+def _chat_ollama(messages, max_new_tokens=MAX_NEW_TOKENS, timeout=900):
     body = json.dumps({
         "model": MODEL_OLLAMA,
         "messages": messages,
         "stream": False,
         "format": "json",
         "options": {"temperature": TEMPERATURE, "num_ctx": 8192,
-                    "num_predict": MAX_NEW_TOKENS},
+                    "num_predict": max_new_tokens},
     }).encode("utf-8")
     req = urllib.request.Request(
         OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
@@ -198,10 +203,10 @@ def _chat_transformers(messages, max_new_tokens=MAX_NEW_TOKENS):
     return tok.decode(new_tokens, skip_special_tokens=True)
 
 
-def _chat(messages):
+def _chat(messages, max_new_tokens=MAX_NEW_TOKENS):
     if BACKEND == "transformers":
-        return _chat_transformers(messages)
-    return _chat_ollama(messages)
+        return _chat_transformers(messages, max_new_tokens=max_new_tokens)
+    return _chat_ollama(messages, max_new_tokens=max_new_tokens)
 
 
 # --------------------------------------------------------------------------
@@ -231,12 +236,17 @@ def generate_note(dialogue, role_field="role"):
     messages = build_messages(dialogue, role_field)
     try:
         soap = parse_note(_chat(messages))
-    except (json.JSONDecodeError, ValueError):
-        # One retry: push the model harder towards JSON
-        messages = messages + [{
-            "role": "user",
-            "content": 'Reply with JSON only: {"S": "...", "O": "...", "A": "...", "P": "..."}'}]
-        soap = parse_note(_chat(messages))
+    except (json.JSONDecodeError, ValueError) as first:
+        # Normally truncation: the longest dialogue overran the token budget.
+        retry = messages + [{"role": "user", "content": RETRY_INSTRUCTION}]
+        try:
+            soap = parse_note(_chat(retry, max_new_tokens=RETRY_MAX_NEW_TOKENS))
+        except (json.JSONDecodeError, ValueError) as second:
+            raise ValueError(
+                f"{dialogue['dialogue_id']} ({condition_name(role_field)}): the model did not "
+                f"return valid JSON twice. First error: {first}. If it says 'Unterminated "
+                f"string', the reply was cut off by the token limit; raise MAX_NEW_TOKENS."
+            ) from second
 
     note = {"dialogue_id": dialogue["dialogue_id"],
             "condition": condition_name(role_field),

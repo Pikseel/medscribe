@@ -63,6 +63,14 @@ intended environment, Colab, is used.
    denied comes out as present, the prompt is too weak; do not continue without `istem_v2.txt`.
 5. Cell 7 produces the six notes, cell 8 the comparison. Commit `notes/outputs/`.
 
+### If a note fails
+
+`generate_note` retries once with a larger token budget and a shorter-output instruction.
+If the error says `Unterminated string`, the reply was cut off by the token cap — that is what
+happened on `aci_003` with a 700-token budget, so `MAX_NEW_TOKENS` is now 1500. Cell 7 is
+resumable: notes already on disk are skipped, only failures are retried. Set
+`SKIP_EXISTING = False` to regenerate everything.
+
 ## Prompt freeze rule
 
 `istem_v1.txt` does not change once the experiment has started. If a change is needed, open
