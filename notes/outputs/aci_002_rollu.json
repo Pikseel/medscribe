@@ -1,0 +1,9 @@
+{
+  "dialogue_id": "aci_002",
+  "condition": "rollu",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "S": "itchy scalp, dandruff, embarrassing, itching, dry scalp, no joint pain, no fever, no weight loss, no rashes elsewhere, no new hair products, no new stressors, family history of similar symptoms in sister, long-standing issue, worsening in past 6 months",
+  "O": "blood pressure 130/68, heart rate 98, respiratory rate 18, temperature 97.7, demarcated scaly erythematous plaques on scalp, diffusely present across back of skull, white dander on clothes",
+  "A": "scalp psoriasis",
+  "P": "prescribed clobetasol 0.05% solution to apply twice daily on affected areas, continue using T-Gel shampoo, follow up in 3 months or sooner if worse, call doctor if worse"
+}

@@ -1,0 +1,9 @@
+{
+  "dialogue_id": "aci_001",
+  "condition": "rolsuz",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "S": "Patient presented with sudden onset of pain in the right back about a week ago while working in the barn. The pain radiated to the groin and was accompanied by nausea. Pain has since subsided, but patient experiences intermittent pain. No blood in urine. Father has had kidney stones in the past, but patient has never had them before. CT scan confirmed a 0.5 cm stone in the proximal right ureter.",
+  "O": "Vitals: good, no fever, blood pressure and heart rate within normal limits. Abdominal examination: no tenderness to palpation, no rebound or guarding, tenderness on the right side. CT scan shows a 0.5 cm stone in the proximal right ureter, no evidence of hydronephrosis.",
+  "A": "Patient has a kidney stone in the proximal right ureter. Plan includes fluid intake to facilitate passage of the stone, oxycodone 5 mg every 6-8 hours for pain, and acetaminophin for breakthrough pain. Urinalysis, BMP, and urine culture ordered to check for infection. Follow-up in one to two weeks to assess stone passage. Lithotripsy may be considered if the stone has not passed by then.",
+  "P": "Patient to continue using a strainer. Schedule follow-up in one to two weeks. Nurse will bring the prescription."
+}

@@ -1,0 +1,9 @@
+{
+  "dialogue_id": "aci_003",
+  "condition": "rolsuz",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "S": "Patient reports foot pain after a soccer injury where another player fell on his right foot. Pain level is 3 without ibuprofen and 7-8 with ibuprofen. Patient has no history of left foot injuries, has been playing soccer since childhood, and no numbness or tingling. Patient has a history of soccer injuries.",
+  "O": "Vitals: BP 180/72, HR 58, RR 14, Afebrile, SpO2 99% on room air. Heart: Regular rate and rhythm, no clicks, rubs, or murmurs. Lungs: Clear and equal bilaterally. Left foot: Bruising, swelling, tenderness to palpation, positive piano key test, brisk capillary refill <3 sec, dorsalis pedis pulse intact and strong, motor and sensation intact to light touch. X-ray: Subtle dorsal displacement of the base of the second metatarsal, 3 mm separation of the first and second metatarsal bases, bony fragment in the Lisfranc joint space.",
+  "A": "Lisfranc fracture of the second metatarsal at the top of the foot. Ligament injury suspected. Surgery recommended to place bones in proper position and use plates and screws for healing. Day surgery, cast, crutches, and non-weight-bearing for 6-8 weeks followed by gradual weight-bearing based on tolerance. Significant complications if untreated, including loss of arch and arthritis.",
+  "P": "Order MRI to assess ligament injury. Schedule surgery. Provide paperwork. Follow up in clinic on Monday."
+}
