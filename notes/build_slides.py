@@ -1,8 +1,8 @@
-"""Kişi 3 sunum slaytları (7 ve 8) — Proje Planı Bölüm 5 slayt planı.
+"""Person 3 presentation slides (7 and 8) — project plan section 5.
 
-Üretir: notes/kisi3_slaytlar.pptx  (2 slayt, 16:9)
-Ayrıca her metin kutusu için gerçek font metrikleriyle taşma denetimi yapar
-(LibreOffice/PowerPoint otomasyonu bu ortamda kapalı olduğu için).
+Produces: results/kisi3_slides.pptx  (2 slides, 16:9)
+It also audits every text box against real font metrics for overflow
+(LibreOffice/PowerPoint automation is unavailable in this environment).
 
     python notes/build_slides.py
 """
@@ -15,7 +15,7 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 from PIL import ImageFont
 
-# ---------------------------------------------------------------- palet
+# ---------------------------------------------------------------- palette
 INK = RGBColor(0x0F, 0x2A, 0x2E)
 TEAL = RGBColor(0x02, 0x80, 0x90)
 TEAL2 = RGBColor(0x00, 0xA8, 0x96)
@@ -48,12 +48,12 @@ def _font(name, size, bold=False):
 
 
 def measure(text, font_name, size, bold=False):
-    """Metnin genişliği (punto)."""
+    """Width of the text in points."""
     return _font(font_name, size, bold).getlength(text)
 
 
 def wrap_lines(text, font_name, size, bold, width_pt):
-    """Açgözlü satır sarma; kaç satır ettiğini döndürür."""
+    """Greedy line wrapping; returns the line count."""
     words = text.split()
     if not words:
         return 1
@@ -68,7 +68,7 @@ def wrap_lines(text, font_name, size, bold, width_pt):
     return lines
 
 
-# ---------------------------------------------------------------- yardımcılar
+# ---------------------------------------------------------------- helpers
 def rect(slide, x, y, w, h, fill=None, line=None, radius=None, line_w=1.0):
     shape_type = MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE
     s = slide.shapes.add_shape(shape_type, Inches(x), Inches(y), Inches(w), Inches(h))
@@ -118,29 +118,29 @@ def para(tf, first, runs, align=PP_ALIGN.LEFT, space_after=0, space_before=0,
     return p
 
 
-# ---------------------------------------------------------------- slaytlar
+# ---------------------------------------------------------------- slides
 def slide_notes_generation(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     rect(s, 0, 0, 13.333, 7.5, fill=BG)
-    rect(s, 0, 0, 0.13, 7.5, fill=TEAL)          # motif: sol kenar şeridi
+    rect(s, 0, 0, 0.13, 7.5, fill=TEAL)          # motif: left edge bar
 
     tb = textbox(s, 0.55, 0.42, 8.0, 0.3)
-    para(tb.text_frame, True, [("KİŞİ 3  ·  NOT ÜRETİMİ", BODY_FONT, 11, True, TEAL)])
+    para(tb.text_frame, True, [("PERSON 3  ·  NOTE GENERATION", BODY_FONT, 11, True, TEAL)])
 
     tb = textbox(s, 0.55, 0.72, 7.6, 0.92)
     para(tb.text_frame, True,
-         [("Transkriptten SOAP notu", TITLE_FONT, 32, True, INK)], line_spacing=0.95)
+         [("SOAP notes from a transcript", TITLE_FONT, 32, True, INK)], line_spacing=0.95)
 
     tb = textbox(s, 0.55, 1.70, 6.9, 0.55)
     para(tb.text_frame, True,
-         [("Qwen2.5-7B-Instruct · 4-bit · temperature 0 · çıktı katı JSON",
+         [("Qwen2.5-7B-Instruct · 4-bit · temperature 0 · strict JSON output",
            BODY_FONT, 12.5, False, MUTED)])
 
     steps = [
-        ("01", "Veri", "ACI-Bench'ten 3 diyalog → ortak JSON; 25–26 cümle, check_format temiz."),
-        ("02", "Transkript", "Rollü koşulda \"Doctor: … / Patient: …\", rolsüz koşulda yalnız cümle metni."),
-        ("03", "İstem", "Tek ve donmuş istem; modele yalnız transkriptteki bilgiyi kullanması söylenir."),
-        ("04", "Çıktı", "S / O / A / P anahtarlı JSON; her alan tek tek denetlenebilir."),
+        ("01", "Data", "3 ACI-Bench dialogues → shared JSON; 25–26 utterances, check_format clean."),
+        ("02", "Transcript", "With roles the lines read \"Doctor: … / Patient: …\"; without roles, plain text only."),
+        ("03", "Prompt", "One frozen prompt; the model may use only what the transcript states."),
+        ("04", "Output", "JSON keyed S / O / A / P, so each section can be checked on its own."),
     ]
     y = 2.52
     for num, head, desc in steps:
@@ -157,20 +157,20 @@ def slide_notes_generation(prs):
              line_spacing=1.08)
         y += 0.88
 
-    # sağ kart: istemden iki kural
-    card = rect(s, 7.45, 2.32, 5.3, 3.55, fill=WHITE, line=SOFT, radius=0.06, line_w=1.25)
+    # right card: two rules from the prompt
+    rect(s, 7.45, 2.32, 5.3, 3.55, fill=WHITE, line=SOFT, radius=0.06, line_w=1.25)
     tb = textbox(s, 7.65, 2.5, 4.9, 0.3)
-    para(tb.text_frame, True, [("DONMUŞ İSTEMDEN İKİ KURAL", BODY_FONT, 10.5, True, TEAL2)])
+    para(tb.text_frame, True, [("TWO RULES FROM THE FROZEN PROMPT", BODY_FONT, 10.5, True, TEAL2)])
 
     rules = [
         ("“Negation matters. If the patient denies a symptom, record it as "
-         "denied — never as present.”", "Olumsuzlama"),
+         "denied — never as present.”", "Negation"),
         ("“Do not turn the doctor’s questions into patient complaints. "
-         "A question is not a symptom.”", "Soru ≠ şikâyet"),
+         "A question is not a symptom.”", "Question ≠ complaint"),
     ]
     ry = 2.9
     for quote, tag in rules:
-        bar = rect(s, 7.65, ry, 0.045, 1.32, fill=MINT)
+        rect(s, 7.65, ry, 0.045, 1.32, fill=MINT)
         tb = textbox(s, 7.82, ry - 0.02, 4.6, 1.3)
         para(tb.text_frame, True, [(quote, BODY_FONT, 11.5, False, INK)], line_spacing=1.1)
         para(tb.text_frame, False, [(tag, BODY_FONT, 9.5, True, MUTED)],
@@ -178,18 +178,19 @@ def slide_notes_generation(prs):
         ry += 1.5
 
     s.notes_slide.notes_text_frame.text = (
-        "KONUŞMACI NOTU — slayt 7 (~60 sn)\n"
-        "1) 'Not üretiminde eğitim yok; hazır bir açık modeli istemle yönlendiriyoruz.'\n"
-        "2) 'Girdi, az önce gördüğünüz ortak JSON: rol etiketli transkript.'\n"
-        "3) 'Tek bir istem dondurduk, temperature 0. Çıktı S/O/A/P anahtarlı JSON; "
-        "böylece her alanı ayrı ayrı denetleyebiliyoruz.'\n"
-        "4) 'İstemdeki iki kritik kural: olumsuzlamayı koru, doktorun sorusunu "
-        "hastanın şikâyeti gibi yazma.'\n"
-        "5) 'Model 4-bit, T4'te çalışıyor; demoda aynı kod kullanılıyor.'\n"
-        "Süre: 4 adım x ~10 sn + 1 cümle kapanış.")
+        "SPEAKER NOTES — slide 7 (~60 s)\n"
+        "1) 'There is no training in note generation; we steer an off-the-shelf open model "
+        "with a prompt.'\n"
+        "2) 'The input is the shared JSON you just saw: a role-labelled transcript.'\n"
+        "3) 'We froze a single prompt at temperature 0. The output is JSON keyed S/O/A/P, "
+        "so we can inspect every section separately.'\n"
+        "4) 'Two critical rules in the prompt: keep negation, and never turn the doctor's "
+        "question into a patient complaint.'\n"
+        "5) 'The model runs 4-bit on a T4, and the demo uses exactly this code.'\n"
+        "Timing: 4 steps x ~10 s plus one closing sentence.")
 
-    # alt istatistikler
-    stats = [("3", "diyalog"), ("2", "koşul"), ("6", "not"), ("0", "eğitim")]
+    # bottom statistics
+    stats = [("3", "dialogues"), ("2", "conditions"), ("6", "notes"), ("0", "training")]
     x = 0.55
     for num, label in stats:
         tb = textbox(s, x, 6.55, 2.9, 0.55)
@@ -205,19 +206,20 @@ def slide_experiment(prs):
     rect(s, 0, 0, 0.13, 7.5, fill=TEAL)
 
     tb = textbox(s, 0.55, 0.42, 8.0, 0.3)
-    para(tb.text_frame, True, [("KİŞİ 3  ·  İLK DENEY", BODY_FONT, 11, True, TEAL)])
+    para(tb.text_frame, True, [("PERSON 3  ·  FIRST EXPERIMENT", BODY_FONT, 11, True, TEAL)])
 
-    tb = textbox(s, 0.55, 0.72, 9.5, 0.75)
-    para(tb.text_frame, True, [("Rollü vs rolsüz: fark nerede?", TITLE_FONT, 32, True, INK)])
+    tb = textbox(s, 0.55, 0.72, 11.5, 0.75)
+    para(tb.text_frame, True, [("With roles vs without: where does it break?",
+                                TITLE_FONT, 32, True, INK)])
 
-    # iki koşul kartı
+    # two condition cards
     cards = [
-        (0.55, "Rollü", "etiketli · gold_role · sadeleştirilmiş", [
+        (0.55, "With roles", "labelled · gold_role · simplified", [
             "Doctor: have you noticed any rashes?",
             "Patient: on my body no not really",
             "Doctor: okay, mainly underneath the scalp",
         ], TEAL),
-        (6.95, "Rolsüz", "etiket yok · yalnız cümle metni", [
+        (6.95, "Without roles", "no labels · text only", [
             "have you noticed any rashes?",
             "on my body no not really",
             "okay, mainly underneath the scalp",
@@ -235,62 +237,63 @@ def slide_experiment(prs):
             para(tf, i == 0, [(line, "Courier New", 10.5, False, INK)],
                  line_spacing=1.25, space_after=2)
 
-    # bulgu bandı
+    # finding band
     rect(s, 0.55, 4.62, 12.23, 2.28, fill=WHITE, line=SOFT, radius=0.04, line_w=1.25)
     rect(s, 0.55, 4.62, 0.05, 2.28, fill=MINT)
 
     tb = textbox(s, 0.8, 4.76, 7.5, 0.32)
-    para(tb.text_frame, True, [("BEKLENEN RİSK: OLUMSUZLAMANIN KAYBI",
+    para(tb.text_frame, True, [("EXPECTED RISK: LOST NEGATION",
                                 BODY_FONT, 10.5, True, TEAL2)])
 
     tb = textbox(s, 0.8, 5.08, 7.6, 1.66)
     tf = tb.text_frame
-    para(tf, True, [("aci_002 — hasta döküntüyü reddediyor; referans not ", BODY_FONT, 11.5, False, INK),
-                    ("“Skin: Denies any rashes.”", BODY_FONT, 11.5, True, INK),
-                    (" diyor.", BODY_FONT, 11.5, False, INK)], line_spacing=1.15)
-    para(tf, False, [("Etiket kalkınca modelin “no, not really” ifadesini kime ait "
-                      "olduğunu kestirememesi ve bulguyu olumlu yazması beklenir.",
+    para(tf, True, [("aci_002 — the patient denies a rash; the reference note ", BODY_FONT, 11.5, False, INK),
+                    ("“Skin: Denies any rashes.”", BODY_FONT, 11.5, True, INK)],
+             line_spacing=1.15)
+    para(tf, False, [("Once the labels are gone we expect the model to lose track of whose "
+                      "“no, not really” it is and record the finding as present.",
                       BODY_FONT, 11.5, False, MUTED)], space_before=5, line_spacing=1.15)
-    para(tf, False, [("compare_notes.py bunu otomatik bayraklıyor: referansta "
-                      "“denies X” → notta olumsuzlamasız X.",
+    para(tf, False, [("compare_notes.py flags this automatically: “denies X” in the "
+                      "reference → X without negation in the note.",
                       BODY_FONT, 10.5, False, MUTED)], space_before=5, line_spacing=1.15)
 
-    # sonuç kutusu (Colab çıktısıyla doldurulacak)
-    box = rect(s, 8.72, 4.86, 3.85, 1.5, fill=SOFT, line=TEAL2, radius=0.05, line_w=1.0)
+    # result box (filled in after the Colab run)
+    rect(s, 8.72, 4.86, 3.85, 1.5, fill=SOFT, line=TEAL2, radius=0.05, line_w=1.0)
     tb = textbox(s, 8.88, 4.96, 3.55, 1.3)
     tf = tb.text_frame
-    para(tf, True, [("SONUÇ", BODY_FONT, 9.5, True, TEAL)])
-    para(tf, False, [("Colab çalışınca doldur:", BODY_FONT, 9.5, False, MUTED)],
+    para(tf, True, [("RESULT", BODY_FONT, 9.5, True, TEAL)])
+    para(tf, False, [("Fill in after the Colab run:", BODY_FONT, 9.5, False, MUTED)],
          space_before=2)
-    para(tf, False, [("olumsuzlama bayrağı", BODY_FONT, 10, False, INK)],
+    para(tf, False, [("negation flags", BODY_FONT, 10, False, INK)],
          space_before=3)
-    para(tf, False, [("rollü  __ / 3      rolsüz  __ / 3",
+    para(tf, False, [("rollu  __ / 3      rolsuz  __ / 3",
                       BODY_FONT, 10, True, INK)], space_before=1)
-    para(tf, False, [("fark yoksa bu da bulgu", BODY_FONT, 8.5, False, MUTED)],
+    para(tf, False, [("no difference is a finding too", BODY_FONT, 8.5, False, MUTED)],
          space_before=2)
 
     s.notes_slide.notes_text_frame.text = (
-        "KONUŞMACI NOTU — slayt 8 (~60 sn)\n"
-        "1) 'Aynı diyaloğu iki koşulda verdik: rollü, yani Doctor/Patient etiketli; "
-        "ve rolsüz, yani etiketsiz düz metin.'\n"
-        "2) 'Tek değişen şey transkript; istem ve model aynı. Farkı ölçülebilir kılan bu.'\n"
-        "3) 'aci_002'de hasta döküntüyü açıkça reddediyor; referans not bunu "
-        "'Denies any rashes' diye yazmış.'\n"
-        "4) 'Rolsüz koşulda beklediğimiz hata: bu olumsuzlamanın kaybolması, yani "
-        "notta döküntünün olumlu görünmesi.'\n"
-        "5) 'Bunu elle aramıyoruz; compare_notes.py referanstaki denies/no kalıplarını "
-        "çıkarıp notta olumsuzlamasız geçenleri bayraklıyor.'\n"
-        "6) 'Sonuç kutusundaki sayıları Colab çıktısından yapıştırıyorum.'")
+        "SPEAKER NOTES — slide 8 (~60 s)\n"
+        "1) 'We gave the same dialogue in two conditions: with roles, meaning Doctor/Patient "
+        "labels, and without roles, meaning plain unlabelled text.'\n"
+        "2) 'The transcript is the only thing that changes; prompt and model stay the same. "
+        "That is what makes the difference measurable.'\n"
+        "3) 'In aci_002 the patient clearly denies a rash, and the reference note records "
+        "'Denies any rashes'.'\n"
+        "4) 'Without labels, the failure we expect is that this negation gets lost, so the "
+        "note reports the rash as present.'\n"
+        "5) 'We do not search for that by hand; compare_notes.py extracts denies/no patterns "
+        "from the reference and flags them when they appear without a negation.'\n"
+        "6) 'I paste the numbers into the result box from the Colab output.'")
 
     tb = textbox(s, 0.55, 7.02, 9.0, 0.3)
-    para(tb.text_frame, True, [("Kişi 3 · SOAP notu ve deney · MedScribe",
+    para(tb.text_frame, True, [("Person 3 · SOAP notes and experiment · MedScribe",
                                 BODY_FONT, 8.5, False, MUTED)])
     return s
 
 
-# ---------------------------------------------------------------- denetim
+# ---------------------------------------------------------------- audit
 def audit(prs):
-    """Her metin kutusu için taşma / taşma riski / slayt dışına çıkma denetimi."""
+    """Per text box: overflow risk, and whether it leaves the slide."""
     issues = []
     for idx, slide in enumerate(prs.slides, 1):
         for sh in slide.shapes:
@@ -299,7 +302,7 @@ def audit(prs):
             x, y = sh.left / EMU_IN, sh.top / EMU_IN
             w, h = sh.width / EMU_IN, sh.height / EMU_IN
             if x < 0.15 or y < 0.15 or x + w > 13.33 - 0.15 or y + h > 7.5 - 0.1:
-                issues.append(f"slayt {idx}: kutu slayt dışına yakın ({x:.2f},{y:.2f},"
+                issues.append(f"slide {idx}: box too close to the slide edge ({x:.2f},{y:.2f},"
                               f"{w:.2f}x{h:.2f})")
             need = 0.0
             for p in sh.text_frame.paragraphs:
@@ -319,13 +322,13 @@ def audit(prs):
                     need += p.space_after.pt
             need_in = need / 72 + 0.04
             if need_in > h + 0.02:
-                issues.append(f"slayt {idx}: TAŞMA riski — kutu {h:.2f}\" / gereken "
+                issues.append(f"slide {idx}: OVERFLOW risk — box {h:.2f}\" / needs "
                               f"{need_in:.2f}\"  [{sh.text_frame.text[:52]!r}]")
     return issues
 
 
 def check_overlaps(prs):
-    """Metin kutularının birbirinin üstüne binmesi (kart içi metinler hariç)."""
+    """Text boxes overlapping each other (text inside cards included)."""
     problems = []
     for idx, slide in enumerate(prs.slides, 1):
         boxes = [(sh.left / EMU_IN, sh.top / EMU_IN, sh.width / EMU_IN, sh.height / EMU_IN,
@@ -338,8 +341,8 @@ def check_overlaps(prs):
                 ox = min(ax + aw, bx + bw) - max(ax, bx)
                 oy = min(ay + ah, by + bh) - max(ay, by)
                 if ox > 0.05 and oy > 0.05:
-                    problems.append(f"slayt {idx}: metin kutuları çakışıyor "
-                                    f"({ox:.2f}x{oy:.2f} inç)")
+                    problems.append(f"slide {idx}: text boxes overlap "
+                                    f"({ox:.2f}x{oy:.2f} in)")
     return problems
 
 
@@ -352,17 +355,17 @@ def main():
     slide_experiment(prs)
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    out = os.path.join(root, "results", "kisi3_slaytlar.pptx")
+    out = os.path.join(root, "results", "kisi3_slides.pptx")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     prs.save(out)
 
     issues = audit(prs)
     overlaps = check_overlaps(prs)
-    print(f"-> {out} ({os.path.getsize(out)/1024:.0f} KB, {len(prs.slides.__iter__.__self__._sldIdLst)} slayt)")
-    print(f"taşma denetimi: {len(issues)} sorun")
+    print(f"-> {out} ({os.path.getsize(out)/1024:.0f} KB, {len(prs.slides._sldIdLst)} slides)")
+    print(f"overflow audit: {len(issues)} issues")
     for i in issues:
         print("  !", i)
-    print(f"çakışma denetimi: {len(overlaps)} sorun")
+    print(f"overlap audit: {len(overlaps)} issues")
     for o in sorted(set(overlaps)):
         print("  !", o)
 

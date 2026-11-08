@@ -1,14 +1,16 @@
-"""Rollü / rolsüz SOAP notlarını yan yana okumak için karşılaştırma (Kişi 3).
+"""Side-by-side comparison of rollu / rolsuz SOAP notes (Person 3).
 
-Girdi : notes/outputs/aci_00X_rollu.json, aci_00X_rolsuz.json, notes/data/aci_00X.json
-Çıktı : notes/outputs/karsilastirma.md  (+ konsola özet)
+Input : notes/outputs/aci_00X_rollu.json, aci_00X_rolsuz.json, notes/data/aci_00X.json
+Output: notes/outputs/comparison.md  (+ a summary on the console)
 
-Otomatik olarak üç şeyi işaretler (insan okumasının yerine geçmez, ona ön hazırlık):
-  1. Olumsuzlama hatası: referans notta "denies / no / negative for" ile geçen bir
-     bulgu, üretilen notta olumsuzlama olmadan geçiyorsa -> FLAG.
-  2. Referansta olmayan bilgi: notta geçen ama referans notta hiç geçmeyen
-     içerik kelimeleri (kaba sezgi, kelime örtüşmesi).
-  3. Bölüm uzunlukları: S/O/A/P karakter sayıları, model boş bölüm bırakmış mı.
+It flags three things automatically. This prepares the human reading, it does
+not replace it:
+  1. Negation error: a finding that the reference note records as denied
+     ("denies / no / negative for") appears in the generated note without a
+     negation cue -> FLAG.
+  2. Information not in the reference: content words that appear in the note
+     but never in the reference note (rough lexical check).
+  3. Section lengths: S/O/A/P character counts, so an empty section is visible.
 """
 
 import json
@@ -41,7 +43,7 @@ def words(text):
 
 
 def stem(w):
-    """Kaba tekilleştirme: rashes->rash, findings->finding (tam stemmer değil)."""
+    """Crude singularisation: rashes->rash, findings->finding (not a real stemmer)."""
     if w.endswith("es") and len(w) > 4:
         return w[:-2]
     if w.endswith("s") and len(w) > 3:
@@ -54,7 +56,7 @@ def content_words(text):
 
 
 def negated_phrases(reference):
-    """Referans nottaki 'Denies X', 'No X', 'Negative for X' ifadelerindeki X'ler."""
+    """The X in 'Denies X', 'No X', 'Negative for X' from the reference note."""
     out = []
     for m in re.finditer(
             r"(denies|denied|negative for|no|without)\s+([^.;\n]{3,80})", reference, re.I):
@@ -74,7 +76,7 @@ def sentences(text):
 
 
 def check_negation(reference, generated):
-    """Referansta olumsuzlanan bulgu, üretilende düz olumlu geçiyor mu?"""
+    """Does a finding denied in the reference appear as plain positive in the output?"""
     flags = []
     for cue, phrase in negated_phrases(reference):
         keys = content_words(phrase) - {"any"}
@@ -89,39 +91,39 @@ def check_negation(reference, generated):
 
 
 def novelty(reference, generated):
-    """Üretilende olup referansta hiç geçmeyen içerik kelimeleri."""
+    """Content words present in the output but absent from the reference."""
     return sorted(content_words(generated) - content_words(reference))
 
 
 def render_one(did, ref, rollu, rolsuz):
     lines = [f"## {did}", ""]
-    lines.append(f"**Referans not** ({len(ref)} karakter)")
+    lines.append(f"**Reference note** ({len(ref)} chars)")
     lines.append("")
     lines.append("```\n" + ref.strip() + "\n```")
     lines.append("")
 
-    for name, note in (("Rollü (gold_role)", rollu), ("Rolsüz (None)", rolsuz)):
+    for name, note in (("With roles (gold_role)", rollu), ("Without roles (None)", rolsuz)):
         lines.append(f"### {name} — model: `{note['model']}`")
         lines.append("")
         for sec in SECTIONS:
-            body = note[sec].strip() or "(boş)"
+            body = note[sec].strip() or "(empty)"
             lines.append(f"**{sec}.** {body}")
             lines.append("")
 
         flags = check_negation(ref, " ".join(note[s] for s in SECTIONS))
         if flags:
-            lines.append(f"**Olumsuzlama bayrakları: {len(flags)}**")
+            lines.append(f"**Negation flags: {len(flags)}**")
             for f in flags:
-                lines.append(f"- referansta *\"{f['cue']} {f['reference_phrase']}\"* "
-                             f"→ notta: _{f['sentence']}_")
+                lines.append(f"- reference has *\"{f['cue']} {f['reference_phrase']}\"* "
+                             f"→ note says: _{f['sentence']}_")
             lines.append("")
         else:
-            lines.append("Olumsuzlama bayrağı yok.")
+            lines.append("No negation flags.")
             lines.append("")
 
         extra = novelty(ref, " ".join(note[s] for s in SECTIONS))
         if extra:
-            lines.append(f"Referansta geçmeyen kelimeler ({len(extra)}): "
+            lines.append(f"Words absent from the reference ({len(extra)}): "
                          + ", ".join(extra[:20]))
             lines.append("")
     return "\n".join(lines)
@@ -129,13 +131,13 @@ def render_one(did, ref, rollu, rolsuz):
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    chunks = ["# Rollü / rolsüz SOAP notu karşılaştırması", ""]
+    chunks = ["# Rollu / rolsuz SOAP note comparison", ""]
     summary = []
 
     for did in DIDS:
         path = lambda c: os.path.join(OUT, f"{did}_{c}.json")  # noqa: E731
         if not (os.path.exists(path("rollu")) and os.path.exists(path("rolsuz"))):
-            print(f"{did}: notlar eksik, atlandı")
+            print(f"{did}: notes missing, skipped")
             continue
         ref = load(os.path.join(DATA, f"{did}.json"))["reference_note"] or ""
         rollu, rolsuz = load(path("rollu")), load(path("rolsuz"))
@@ -145,15 +147,15 @@ def main():
         f_rolsuz = check_negation(ref, " ".join(rolsuz[s] for s in SECTIONS))
         summary.append((did, len(f_rollu), len(f_rolsuz)))
 
-    table = ["## Özet", "",
-             "| Diyalog | Rollü olumsuzlama bayrağı | Rolsüz olumsuzlama bayrağı |",
+    table = ["## Summary", "",
+             "| Dialogue | Rollu negation flags | Rolsuz negation flags |",
              "|---|---|---|"]
     for did, a, b in summary:
         table.append(f"| {did} | {a} | {b} |")
     table.append("")
     chunks.insert(1, "\n".join(table))
 
-    out = os.path.join(OUT, "karsilastirma.md")
+    out = os.path.join(OUT, "comparison.md")
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(chunks))
     print("\n".join(table))

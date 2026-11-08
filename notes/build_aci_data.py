@@ -1,23 +1,23 @@
-"""ACI-Bench -> ortak JSON formatı dönüştürücü (Kişi 3, 7 Kasım).
+"""ACI-Bench -> shared JSON format converter (Person 3).
 
-Kaynak: https://github.com/wyim/aci-bench  data/challenge_data/train.csv
-Sütunlar: dataset, encounter_id, dialogue, note
+Source: https://github.com/wyim/aci-bench  data/challenge_data/train.csv
+Columns: dataset, encounter_id, dialogue, note
 
-Dönüşüm kuralları (Proje Planı 2.3):
+Conversion rules (project plan 2.3):
   [doctor]  -> speaker "A", gold_role "Doctor"
   [patient] -> speaker "B", gold_role "Patient"
   note      -> reference_note
-  start/end -> null (metin verisi), role/role_prob -> null (Kişi 2 doldurur)
+  start/end -> null (text data), role/role_prob -> null (filled in by Person 2)
 
-Etiketsiz satırlar (transkript artefaktı) bir önceki cümlenin devamı sayılıp
-ona eklenir; başta gelirse atılır. Üçüncü kişiler zaten etiketli değil, bu yüzden
-ayrıca bir filtre gerekmiyor.
+Untagged lines (transcript artefacts) are treated as a continuation of the
+previous utterance and appended to it; if they come first they are dropped.
+Third parties are not tagged in the source, so no extra filter is needed.
 
-Ham CSV `_raw/` altında tutulur ve repoya girmez (.gitignore); yoksa indirilir.
-Üretilen 3 JSON repoya girer.
+The raw CSV lives under `_raw/` and is not committed (.gitignore); it is
+downloaded when missing. The three generated JSON files are committed.
 
-Kullanım:
-  python -m notes.build_aci_data            # seçili 3 diyaloğu üretir
+Usage:
+  python -m notes.build_aci_data            # generates the three selected dialogues
 """
 
 import csv
@@ -36,12 +36,13 @@ CSV_URL = "https://raw.githubusercontent.com/wyim/aci-bench/main/data/challenge_
 CSV_PATH = os.path.join(HERE, "data", "_raw", "train.csv")
 OUT_DIR = os.path.join(HERE, "data")
 
-# Deney için seçilen 3 diyalog: kısa (25-26 cümle), prompt'a sığar,
-# üçünde de olumsuzlama ("no"/"denies") var -> rollü/rolsüz farkını göstermeye uygun.
-# D2N053 özellikle zengin: referans notta "Denies fever or weight loss" geçiyor.
+# Three dialogues selected for the experiment: short (25-26 utterances) so they
+# fit the prompt comfortably, and all three contain negation ("no"/"denies"),
+# which is what the rollu/rolsuz comparison needs. D2N053 is the richest case:
+# its reference note says "Denies any rashes" and the patient says "no, not really".
 DIALOGUES = [
     ("D2N050", "aci_001"),  # kidney stones
-    ("D2N053", "aci_002"),  # itchy scalp (olumsuzlama bol)
+    ("D2N053", "aci_002"),  # itchy scalp (plenty of negation)
     ("D2N060", "aci_003"),  # left foot pain
 ]
 
@@ -57,12 +58,12 @@ def convert(encounter_id, dialogue_id, dialogue_text, note_text, source="aci-ben
             continue
         m = TAG.match(line)
         if not m:
-            # Etiketsiz satır: önceki cümlenin devamı
+            # Untagged line: continuation of the previous utterance
             if segments and segments[-1]["text"]:
                 segments[-1]["text"] = f"{segments[-1]['text']} {line}".strip()
             continue
         tag = m.group("tag").strip().lower()
-        if tag not in ROLE_OF_TAG:  # üçüncü kişi -> at
+        if tag not in ROLE_OF_TAG:  # third party -> drop
             continue
         text = m.group("text").strip()
         if not text:
@@ -88,11 +89,11 @@ def convert(encounter_id, dialogue_id, dialogue_text, note_text, source="aci-ben
 
 
 def fetch_csv(path=CSV_PATH):
-    """Ham ACI-Bench CSV'si yoksa indir (611 KB, tek seferlik)."""
+    """Download the raw ACI-Bench CSV if it is missing (611 KB, one-off)."""
     if os.path.exists(path):
         return path
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    print(f"indiriliyor: {CSV_URL}")
+    print(f"downloading: {CSV_URL}")
     urllib.request.urlretrieve(CSV_URL, path)
     return path
 
@@ -109,9 +110,9 @@ def main():
         save(d, path)          # common.format.save -> check_format + json.dump
         n_doc = sum(s["gold_role"] == "Doctor" for s in d["segments"])
         print(
-            f"{path}: {len(d['segments'])} cümle "
-            f"({n_doc} doktor / {len(d['segments']) - n_doc} hasta), "
-            f"not {len(d['reference_note'])} karakter, check_format OK"
+            f"{path}: {len(d['segments'])} utterances "
+            f"({n_doc} doctor / {len(d['segments']) - n_doc} patient), "
+            f"note {len(d['reference_note'])} chars, check_format OK"
         )
 
 

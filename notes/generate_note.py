@@ -1,25 +1,25 @@
-"""MedScribe — SOAP notu üretimi (Kişi 3).
+"""MedScribe — SOAP note generation (Person 3).
 
-Proje Planı 2.4 imzası:
+Project plan section 2.4 signature:
     generate_note(dialogue, role_field) -> note
-        role_field = "role"      -> modelin tahmin ettiği roller   (demo)
-        role_field = "gold_role" -> doğru roller                   ("rollu" koşulu)
-        role_field = None        -> konuşmacı bilgisi yok           ("rolsuz" koşulu)
+        role_field = "role"      -> roles predicted by the classifier  (demo)
+        role_field = "gold_role" -> gold roles                         ("rollu" condition)
+        role_field = None        -> no speaker information             ("rolsuz" condition)
 
-İstem metni: notes/istem_v1.txt (dondurulmuş). Kodda istem kopyası YOKTUR;
-istem değişecekse dosya değişir ve sürüm adı büyür (istem_v2.txt).
+Prompt text: notes/istem_v1.txt (frozen). There is no copy of the prompt in code;
+to change it, edit the file and bump the version name (istem_v2.txt).
 
-Arka uç otomatik seçilir (SOAP_BACKEND veya --backend ile zorlanabilir):
-    "transformers" -> GPU varsa: 4-bit Qwen/Qwen2.5-7B-Instruct (Colab / T4)
-    "ollama"       -> aksi halde: yerel Ollama, qwen2.5:7b-instruct-q4_K_M
+The backend is selected automatically (force it with SOAP_BACKEND or --backend):
+    "transformers" -> when a GPU is present: 4-bit Qwen/Qwen2.5-7B-Instruct (Colab / T4)
+    "ollama"       -> otherwise: local Ollama, qwen2.5:7b-instruct-q4_K_M
 
-Yalnızca `_chat()` çevresindeki iki fonksiyon arka uca bağlıdır; transkript
-kurma, istem ve JSON ayrıştırma her iki uçta birebir aynıdır.
+Only the two functions around `_chat()` depend on the backend. Transcript building,
+prompting and JSON parsing are identical on both.
 
-CLI (repo kökünden):
+CLI (from the repository root):
     python -m notes.generate_note --dialogue common/ornek_diyalog.json --role-field gold_role
     python -m notes.generate_note --prompt-only --dialogue notes/data/aci_001.json --role-field None
-    python -m notes.generate_note --experiment     # 3 diyalog x 2 koşul -> notes/outputs/
+    python -m notes.generate_note --experiment     # 3 dialogues x 2 conditions -> notes/outputs/
 """
 
 import argparse
@@ -31,19 +31,22 @@ import urllib.error
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)                       # repo kökü
+ROOT = os.path.dirname(HERE)                       # repository root
 PROMPT_PATH = os.path.join(HERE, "istem_v1.txt")
 OUT_DIR = os.path.join(HERE, "outputs")
 
 MODEL_OLLAMA = "qwen2.5:7b-instruct-q4_K_M"
 MODEL_HF = "Qwen/Qwen2.5-7B-Instruct"
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
-TEMPERATURE = 0          # dondurulmuş: deney boyunca değişmez
+TEMPERATURE = 0          # frozen: unchanged for the whole experiment
 MAX_NEW_TOKENS = 700
 
 
 def _detect_backend():
-    """GPU + transformers varsa transformers, yoksa ollama. Ortam değişkeni önceliklidir."""
+    """transformers when a GPU and the library are available, Ollama otherwise.
+
+    The environment variable takes precedence.
+    """
     if os.environ.get("SOAP_BACKEND"):
         return os.environ["SOAP_BACKEND"]
     try:
@@ -70,25 +73,25 @@ def model_name():
 
 
 def condition_name(role_field):
-    """Plan Bölüm 2.3: not çıktısındaki `condition` alanı 'rollu' veya 'rolsuz'."""
+    """Plan section 2.3: the `condition` field of a note is 'rollu' or 'rolsuz'."""
     return "rollu" if role_field else "rolsuz"
 
 
 # --------------------------------------------------------------------------
-# Dondurulmuş istem
+# Frozen prompt
 # --------------------------------------------------------------------------
 
 def load_prompt(path=PROMPT_PATH):
-    """istem_v1.txt -> (system, user_template). Dosya tek doğruluk kaynağıdır."""
+    """istem_v1.txt -> (system, user_template). The file is the single source of truth."""
     with open(path, encoding="utf-8") as f:
         raw = f.read()
     parts = re.split(r"^\[(SYSTEM|USER)\]\s*$", raw, flags=re.MULTILINE)
     # ["", "SYSTEM", <system>, "USER", <user>]
     if len(parts) != 5:
-        raise ValueError(f"{path}: [SYSTEM] ve [USER] bölümleri bekleniyordu")
+        raise ValueError(f"{path}: expected [SYSTEM] and [USER] sections")
     system, user = parts[2].strip(), parts[4].strip()
     if "{transcript}" not in user:
-        raise ValueError(f"{path}: USER bölümünde {{transcript}} yok")
+        raise ValueError(f"{path}: USER section is missing {{transcript}}")
     return system, user
 
 
@@ -96,14 +99,15 @@ SYSTEM_PROMPT, USER_TEMPLATE = load_prompt()
 
 
 # --------------------------------------------------------------------------
-# Transkript kurma
+# Transcript building
 # --------------------------------------------------------------------------
 
 def build_transcript(dialogue, role_field):
-    """role_field doluysa 'Doctor: ...' / 'Patient: ...', None ise çıplak metin.
+    """'Doctor: ...' / 'Patient: ...' when role_field is set, bare text when None.
 
-    rolsüz koşulda konuşmacı sırası korunur ama kim olduğu söylenmez; rol alanı
-    boş kalan cümleler (örn. Kişi 2 henüz çalışmadıysa) etiketsiz yazılır.
+    The rolsuz condition keeps the speaker order but hides who is who. Segments
+    whose role is still null (e.g. the classifier has not run yet) are written
+    without a label.
     """
     lines = []
     for seg in dialogue["segments"]:
@@ -124,7 +128,7 @@ def build_messages(dialogue, role_field):
 
 
 # --------------------------------------------------------------------------
-# Model çağrısı — arka uca bağlı tek yer
+# Model call — the only backend-dependent part
 # --------------------------------------------------------------------------
 
 def _chat_ollama(messages, timeout=900):
@@ -144,20 +148,20 @@ def _chat_ollama(messages, timeout=900):
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise RuntimeError(
-                f"Ollama'da '{MODEL_OLLAMA}' yok. Çözüm: `ollama pull {MODEL_OLLAMA}` "
-                f"veya Colab'da SOAP_BACKEND=transformers kullan.") from e
+                f"Ollama does not have '{MODEL_OLLAMA}'. Fix: `ollama pull {MODEL_OLLAMA}`, "
+                f"or use SOAP_BACKEND=transformers on Colab.") from e
         raise
     except urllib.error.URLError as e:
         raise RuntimeError(
-            "Ollama sunucusuna ulaşılamadı (http://127.0.0.1:11434). "
-            "`ollama serve` çalışıyor mu? Colab'da SOAP_BACKEND=transformers kullan.") from e
+            "Could not reach the Ollama server (http://127.0.0.1:11434). "
+            "Is `ollama serve` running? On Colab use SOAP_BACKEND=transformers.") from e
 
 
 _HF = {}
 
 
 def _load_hf():
-    """Colab/T4: 4-bit yükleme. Bir kez çağrılır, bellekte kalır."""
+    """Colab/T4: 4-bit loading. Called once, then kept in memory."""
     if _HF:
         return _HF["model"], _HF["tok"]
     import torch
@@ -166,7 +170,7 @@ def _load_hf():
     bnb = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,   # T4 bf16 desteklemez
+        bnb_4bit_compute_dtype=torch.float16,   # the T4 does not support bf16
         bnb_4bit_use_double_quant=True,
     )
     tok = AutoTokenizer.from_pretrained(MODEL_HF)
@@ -201,7 +205,7 @@ def _chat(messages):
 
 
 # --------------------------------------------------------------------------
-# Çıktı ayrıştırma
+# Output parsing
 # --------------------------------------------------------------------------
 
 FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
@@ -218,17 +222,17 @@ def parse_note(content):
         obj = json.loads(raw[start:end + 1])
     missing = [k for k in ("S", "O", "A", "P") if k not in obj]
     if missing:
-        raise ValueError(f"model çıktısında eksik alan: {missing}")
+        raise ValueError(f"model output is missing fields: {missing}")
     return {k: str(obj[k]).strip() for k in ("S", "O", "A", "P")}
 
 
 def generate_note(dialogue, role_field="role"):
-    """Ana teslim fonksiyonu. Dönen sözlük: dialogue_id, condition, model, S, O, A, P."""
+    """Main deliverable. Returns: dialogue_id, condition, model, S, O, A, P."""
     messages = build_messages(dialogue, role_field)
     try:
         soap = parse_note(_chat(messages))
     except (json.JSONDecodeError, ValueError):
-        # Tek yeniden deneme: modeli JSON'a daha sert yönlendir
+        # One retry: push the model harder towards JSON
         messages = messages + [{
             "role": "user",
             "content": 'Reply with JSON only: {"S": "...", "O": "...", "A": "...", "P": "..."}'}]
@@ -272,7 +276,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dialogue")
     ap.add_argument("--role-field", default="gold_role",
-                    help='"role", "gold_role" veya None')
+                    help='"role", "gold_role" or None')
     ap.add_argument("--backend", default=BACKEND, choices=["ollama", "transformers"])
     ap.add_argument("--prompt-only", action="store_true")
     ap.add_argument("--experiment", action="store_true")
@@ -293,7 +297,7 @@ def main():
             out = os.path.join(a.out, f"{d['dialogue_id']}_{cond}.json")
             save_note(note, out)
             print(f"{out}: S{len(note['S'])} O{len(note['O'])} "
-                  f"A{len(note['A'])} P{len(note['P'])} karakter")
+                  f"A{len(note['A'])} P{len(note['P'])} chars")
         return
 
     d = load(a.dialogue)
