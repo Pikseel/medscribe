@@ -214,12 +214,12 @@ def slide_experiment(prs):
 
     # two condition cards
     cards = [
-        (0.55, "With roles", "labelled · gold_role · simplified", [
+        (0.55, "With roles", "labelled · gold_role · aci_002 excerpt", [
             "Doctor: have you noticed any rashes?",
             "Patient: on my body no not really",
             "Doctor: okay, mainly underneath the scalp",
         ], TEAL),
-        (6.95, "Without roles", "no labels · text only", [
+        (6.95, "Without roles", "no labels · aci_002 excerpt", [
             "have you noticed any rashes?",
             "on my body no not really",
             "okay, mainly underneath the scalp",
@@ -242,34 +242,36 @@ def slide_experiment(prs):
     rect(s, 0.55, 4.62, 0.05, 2.28, fill=MINT)
 
     tb = textbox(s, 0.8, 4.76, 7.5, 0.32)
-    para(tb.text_frame, True, [("EXPECTED RISK: LOST NEGATION",
+    para(tb.text_frame, True, [("WHAT THE SIX NOTES SHOWED",
                                 BODY_FONT, 10.5, True, TEAL2)])
 
     tb = textbox(s, 0.8, 5.08, 7.6, 1.66)
     tf = tb.text_frame
-    para(tf, True, [("aci_002 — the patient denies a rash; the reference note ", BODY_FONT, 11.5, False, INK),
-                    ("“Skin: Denies any rashes.”", BODY_FONT, 11.5, True, INK)],
-             line_spacing=1.15)
-    para(tf, False, [("Once the labels are gone we expect the model to lose track of whose "
-                      "“no, not really” it is and record the finding as present.",
-                      BODY_FONT, 11.5, False, MUTED)], space_before=5, line_spacing=1.15)
-    para(tf, False, [("compare_notes.py flags this automatically: “denies X” in the "
-                      "reference → X without negation in the note.",
-                      BODY_FONT, 10.5, False, MUTED)], space_before=5, line_spacing=1.15)
+    para(tf, True, [("aci_003, the longest dialogue: with roles the note echoed the transcript — ",
+                    BODY_FONT, 11, False, INK),
+                    ("3,229 chars, 65% of it, 7 of 9 S sentences in first person", BODY_FONT, 11, True, INK),
+                    (". Without roles it summarised: 1,329 chars, third person.", BODY_FONT, 11, False, INK)],
+             line_spacing=1.1)
+    para(tf, False, [("aci_002 without roles: “no joint pain, fever, weight loss” — the negation "
+                      "covers only the first item, so fever and weight loss read as present.",
+                      BODY_FONT, 11, False, MUTED)], space_before=4, line_spacing=1.1)
+    para(tf, False, [("Shared: “one eighteen over seventy-two” became 180/72 in both, and both "
+                      "added “push fluids”, which nobody said.",
+                      BODY_FONT, 10.5, False, MUTED)], space_before=4, line_spacing=1.1)
 
     # result box (filled in after the Colab run)
     rect(s, 8.72, 4.86, 3.85, 1.5, fill=SOFT, line=TEAL2, radius=0.05, line_w=1.0)
     tb = textbox(s, 8.88, 4.96, 3.55, 1.3)
     tf = tb.text_frame
     para(tf, True, [("RESULT", BODY_FONT, 9.5, True, TEAL)])
-    para(tf, False, [("Fill in after the Colab run:", BODY_FONT, 9.5, False, MUTED)],
-         space_before=2)
-    para(tf, False, [("negation flags", BODY_FONT, 10, False, INK)],
+    para(tf, False, [("rollu: 1 of 3 echoed the transcript", BODY_FONT, 10, False, INK)],
          space_before=3)
-    para(tf, False, [("rollu  __ / 3      rolsuz  __ / 3",
-                      BODY_FONT, 10, True, INK)], space_before=1)
-    para(tf, False, [("no difference is a finding too", BODY_FONT, 8.5, False, MUTED)],
-         space_before=2)
+    para(tf, False, [("rolsuz: 1 of 3 lost negation scope", BODY_FONT, 10, False, INK)],
+         space_before=1)
+    para(tf, False, [("both: 1 number error, 1 added fact", BODY_FONT, 10, False, INK)],
+         space_before=1)
+    para(tf, False, [("details: notes/findings.md", BODY_FONT, 8.5, False, MUTED)],
+         space_before=3)
 
     s.notes_slide.notes_text_frame.text = (
         "SPEAKER NOTES — slide 8 (~60 s)\n"
@@ -277,13 +279,15 @@ def slide_experiment(prs):
         "labels, and without roles, meaning plain unlabelled text.'\n"
         "2) 'The transcript is the only thing that changes; prompt and model stay the same. "
         "That is what makes the difference measurable.'\n"
-        "3) 'In aci_002 the patient clearly denies a rash, and the reference note records "
-        "'Denies any rashes'.'\n"
-        "4) 'Without labels, the failure we expect is that this negation gets lost, so the "
-        "note reports the rash as present.'\n"
-        "5) 'We do not search for that by hand; compare_notes.py extracts denies/no patterns "
-        "from the reference and flags them when they appear without a negation.'\n"
-        "6) 'I paste the numbers into the result box from the Colab output.'")
+        "3) 'On the longest dialogue, aci_003, it went the other way: with roles the model "
+        "echoed the transcript, 3,229 characters, seven of nine S sentences in first person; "
+        "without roles it summarised in 1,329.'\n"
+        "4) 'On aci_002 without roles the negation only covered the first item: no joint pain, "
+        "fever, weight loss. With roles each item kept its own no.'\n"
+        "5) 'Both conditions share one number error, 118 over 72 became 180 over 72, and both "
+        "added push fluids, which nobody said.'\n"
+        "6) 'So the effect of role labels is conditional on dialogue length, and the prompt "
+        "needs an explicit summarisation rule.'")
 
     tb = textbox(s, 0.55, 7.02, 9.0, 0.3)
     para(tb.text_frame, True, [("Person 3 · SOAP notes and experiment · MedScribe",

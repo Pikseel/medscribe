@@ -1,11 +1,22 @@
 # Rollu / rolsuz SOAP note comparison
+
+
+
+Objective measurements only. Negation and content errors are reviewed by hand in `notes/findings.md`.
+
 ## Summary
 
-| Dialogue | Rollu negation flags | Rolsuz negation flags |
-|---|---|---|
-| aci_001 | 1 | 2 |
-| aci_002 | 0 | 0 |
-| aci_003 | 4 | 2 |
+| Dialogue | Condition | Chars | Note/transcript | S first person | ASR artefacts | Echo warnings |
+|---|---|---|---|---|---|---|
+| aci_001 | rollu | 1178 | 29% | 0 | 1 | 0 |
+| aci_001 | rolsuz | 1173 | 29% | 0 | 0 | 0 |
+| aci_002 | rollu | 627 | 13% | 0 | 0 | 0 |
+| aci_002 | rolsuz | 797 | 17% | 0 | 0 | 0 |
+| aci_003 | rollu | 3229 | 65% | 7 | 7 | 3 |
+| aci_003 | rolsuz | 1329 | 27% | 0 | 0 | 0 |
+
+Echo warning when note/transcript >= 50%, S first person >= 2, or >= 3 ASR artefacts.
+
 
 
 ## aci_001
@@ -52,6 +63,8 @@ The patient will follow up with me in 1 to 2 weeks to check on his progress. If 
 
 ### With roles (gold_role) — model: `Qwen/Qwen2.5-7B-Instruct`
 
+1178 chars · 29% of transcript · S first person 0/6 · ASR artefacts 1
+
 **S.** patient had a sudden onset of pain in the right back about a week ago while working in the barn. The pain radiated to the groin and was accompanied by nausea. Pain comes and goes, and patient has been straining urine but not seeing anything in the cup. No blood in urine. Father had kidney stones in the past, but patient has never had them before. Patient had a CT scan which showed a 0.5 cm stone in the proximal right ureter.
 
 **O.** vital signs looked good, no fever, blood pressure and heart rate were fine. Abdominal examination showed no tenderness, no rebound or guarding, but tenderness on the right side. CT scan showed a 0.5 cm stone in the proximal right ureter, no evidence of hydronephrosis.
@@ -60,12 +73,9 @@ The patient will follow up with me in 1 to 2 weeks to check on his progress. If 
 
 **P.** patient to continue using the strainer, take prescribed medications, and follow up in 1-2 weeks. Nurse will bring the prescription.
 
-**Negation flags: 1**
-- reference has *"no pain with palpation of the abdomen"* → note says: _patient had a sudden onset of pain in the right back about a week ago while working in the barn._
-
-Words absent from the reference (28): abdominal, about, accompanied, acetaminophin, bring, com, cup, fever, fine, fluid, goe, hasn't, heart, includ, looked, medication, nausea, nurse, passed, prescription
-
 ### Without roles (None) — model: `Qwen/Qwen2.5-7B-Instruct`
+
+1173 chars · 29% of transcript · S first person 0/6 · ASR artefacts 0
 
 **S.** Patient presented with sudden onset of pain in the right back about a week ago while working in the barn. The pain radiated to the groin and was accompanied by nausea. Pain has since subsided, but patient experiences intermittent pain. No blood in urine. Father has had kidney stones in the past, but patient has never had them before. CT scan confirmed a 0.5 cm stone in the proximal right ureter.
 
@@ -75,11 +85,6 @@ Words absent from the reference (28): abdominal, about, accompanied, acetaminoph
 
 **P.** Patient to continue using a strainer. Schedule follow-up in one to two weeks. Nurse will bring the prescription.
 
-**Negation flags: 2**
-- reference has *"denies having kidney stones before"* → note says: _Patient has a kidney stone in the proximal right ureter._
-- reference has *"no pain with palpation of the abdomen"* → note says: _Patient presented with sudden onset of pain in the right back about a week ago while working in the barn._
-
-Words absent from the reference (32): abdominal, about, accompanied, acetaminophin, asses, bring, confirmed, considered, experienc, facilitate, fever, fluid, heart, includ, intake, nausea, nurse, one, passage, passed
 
 ## aci_002
 
@@ -124,6 +129,8 @@ The patient will follow-up in 3 months or sooner if her conditions worsen.
 
 ### With roles (gold_role) — model: `Qwen/Qwen2.5-7B-Instruct`
 
+627 chars · 13% of transcript · S first person 0/1 · ASR artefacts 0
+
 **S.** itchy scalp, dandruff, embarrassing, itching, dry scalp, no joint pain, no fever, no weight loss, no rashes elsewhere, no new hair products, no new stressors, family history of similar symptoms in sister, long-standing issue, worsening in past 6 months
 
 **O.** blood pressure 130/68, heart rate 98, respiratory rate 18, temperature 97.7, demarcated scaly erythematous plaques on scalp, diffusely present across back of skull, white dander on clothes
@@ -132,11 +139,9 @@ The patient will follow-up in 3 months or sooner if her conditions worsen.
 
 **P.** prescribed clobetasol 0.05% solution to apply twice daily on affected areas, continue using T-Gel shampoo, follow up in 3 months or sooner if worse, call doctor if worse
 
-No negation flags.
-
-Words absent from the reference (32): affected, area, blood, call, cloth, continue, dander, dandruff, doctor, dry, elsewhere, embarrassing, family, hair, heart, history, issue, itching, long, new
-
 ### Without roles (None) — model: `Qwen/Qwen2.5-7B-Instruct`
+
+797 chars · 17% of transcript · S first person 0/1 · ASR artefacts 0
 
 **S.** itchy scalp pain for a while, worsening in the past six months, dandruff, itching, embarrassing, no rashes elsewhere, no joint pain, fever, weight loss, no new stressors, sister has dry scalp, no significant family history of similar symptoms.
 
@@ -146,9 +151,6 @@ Words absent from the reference (32): affected, area, blood, call, cloth, contin
 
 **P.** use clobetasol 0.05% solution twice daily, continue to use T-Gel shampoo, follow-up in three months or sooner if worse, call if it gets worse.
 
-No negation flags.
-
-Words absent from the reference (33): affected, area, blood, call, cloth, continue, dander, dandruff, dry, elsewhere, embarrassing, family, get, heart, history, itching, needed, new, past, pressure
 
 ## aci_003
 
@@ -218,6 +220,10 @@ We will see the patient on Monday, for surgery.
 
 ### With roles (gold_role) — model: `Qwen/Qwen2.5-7B-Instruct`
 
+3229 chars · 65% of transcript · S first person 7/9 · ASR artefacts 7
+
+**Transcript echo warning:** note is 65% of the transcript; 7/9 S sentences in first person; 7 ASR artefacts carried over
+
 **S.** i'm doing alright aside from this foot pain that i have. i was playing in a soccer game yesterday and i was trying to steal the ball from another player and she ended up falling directly onto my right foot and i do n't know i i mean i was trying to get around her and my body ended up twisting around her and then i accidentally felt a pain in my foot. i've been keeping it elevated icing it the trainer wrapped it yesterday and taking ibuprofen as well. without ibuprofen i would say my pain is a three. with ibuprofen i would say my pain is a seven eight. i have not had a lot of injuries in soccer but never injured this foot. i had to stop playing right away and actually being helped off the field. i have been playing soccer since i was four five. i have experienced nothing like numbness or tingling or or any strange sensation.
 
 **O.** blood pressure was one eighty one over seventy two heart rate was fifty eight respiratory rate was fourteen afebrile and oxygen saturation of ninety nine percent on room air. regular rate and rhythm no clicks rubs or murmurs no ectopic beats noted on auscultation lungs are clear and equal bilaterally. some bruising on the bottom of the foot and on the top of the foot. associated swelling. tenderness to palpation of the midfoot. positive for the piano key test. brisk capillary refill of less than three seconds. dorsalis pedis pulse is intact and strong. motor and sensation intact to light touch. subtle dorsal displacement of the base of the second metatarsal with a three millimeter separation of the first and second metatarsal bases. presence of a bony fragment in the lisfranc joint space.
@@ -226,15 +232,9 @@ We will see the patient on Monday, for surgery.
 
 **P.** unfortunately you'll be out the rest of the season but we are gon na get you fixed up and ready for next season. i am having the nurse come in and get you started on your paperwork and then i will see you on monday morning and we will get your foot taken care of.
 
-**Negation flags: 4**
-- reference has *"without medication her pain is rated as 7-8/10"* → note says: _i'm doing alright aside from this foot pain that i have._
-- reference has *"no numbness"* → note says: _i have experienced nothing like numbness or tingling or or any strange sensation._
-- reference has *"denies left foot numbness or tingling"* → note says: _i'm doing alright aside from this foot pain that i have._
-- reference has *"no ectopic beats noted on auscultation of the heart"* → note says: _blood pressure was one eighty one over seventy two heart rate was fifty eight respiratory rate was fourteen afebrile and oxygen saturation of ninety nine percent on room air._
-
-Words absent from the reference (124): about, accidentally, actually, allow, alright, arch, around, aside, away, back, ball, because, becoming, believe, body, bon, bottom, bruising, can, care
-
 ### Without roles (None) — model: `Qwen/Qwen2.5-7B-Instruct`
+
+1329 chars · 27% of transcript · S first person 0/4 · ASR artefacts 0
 
 **S.** Patient reports foot pain after a soccer injury where another player fell on his right foot. Pain level is 3 without ibuprofen and 7-8 with ibuprofen. Patient has no history of left foot injuries, has been playing soccer since childhood, and no numbness or tingling. Patient has a history of soccer injuries.
 
@@ -243,9 +243,3 @@ Words absent from the reference (124): about, accidentally, actually, allow, alr
 **A.** Lisfranc fracture of the second metatarsal at the top of the foot. Ligament injury suspected. Surgery recommended to place bones in proper position and use plates and screws for healing. Day surgery, cast, crutches, and non-weight-bearing for 6-8 weeks followed by gradual weight-bearing based on tolerance. Significant complications if untreated, including loss of arch and arthritis.
 
 **P.** Order MRI to assess ligament injury. Schedule surgery. Provide paperwork. Follow up in clinic on Monday.
-
-**Negation flags: 2**
-- reference has *"without medication her pain is rated as 7-8/10"* → note says: _Patient reports foot pain after a soccer injury where another player fell on his right foot._
-- reference has *"denies left foot numbness or tingling"* → note says: _Patient reports foot pain after a soccer injury where another player fell on his right foot._
-
-Words absent from the reference (35): arch, bearing, bon, bruising, cast, childhood, crutch, day, fell, follow, followed, gradual, level, los, non, paperwork, place, plat, position, proper

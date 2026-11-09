@@ -12,7 +12,8 @@ information on the note. Project plan section 3 (Person 3) and section 4 (calend
 | `istem_v1.txt` | **Frozen** prompt. Single source of truth; no copy in code |
 | `data/aci_001..003.json` | 3 dialogues selected from ACI-Bench, in the shared format (`check_format` clean) |
 | `build_aci_data.py` | CSV → JSON converter (downloads the raw CSV if missing) |
-| `compare_notes.py` | Side-by-side rollu/rolsuz notes + negation flags → `outputs/comparison.md` |
+| `compare_notes.py` | Side-by-side rollu/rolsuz notes + objective metrics → `outputs/comparison.md` |
+| `findings.md` | Manual review of the six notes: the errors, and which are inherited from the transcript |
 | `colab_soap.ipynb` | Colab notebook that produces the 6 notes (clones the repo, T4) |
 | `outputs/` | The 6 generated notes + the comparison report |
 
@@ -50,11 +51,17 @@ Selected dialogues (all 25–26 utterances, all containing negation):
 | `aci_002` | D2N053 | itchy scalp — reference note says "Denies any rashes" |
 | `aci_003` | D2N060 | left foot pain |
 
-**Status:** code and prompt are ready; the 6 notes are produced on Colab (T4). The 7B model
-could not be downloaded locally (network ~300 KB/s → 4+ hours), which is why the plan's
-intended environment, Colab, is used.
+**Status: done.** All six notes were generated on Colab (T4) with `Qwen/Qwen2.5-7B-Instruct`
+4-bit, temperature 0, frozen `istem_v1`. Results in `outputs/` and `findings.md`.
 
-### Colab
+Headline: role labels are not uniformly better. On the longest dialogue (`aci_003`) the labelled
+transcript made the model echo the conversation (3,229 chars, 65% of the transcript, 7 of 9 S
+sentences in first person); without labels it summarised (1,329 chars). On `aci_002` the labels
+did help: the rolsuz note scoped "no" over one item only, so fever and weight loss read as
+present. Shared errors: 118/72 became 180/72 in both, and both added "push fluids" that nobody
+said. See `findings.md` for the quote-level review.
+
+### Reproducing on Colab
 
 1. Upload `notes/colab_soap.ipynb` to Colab.
 2. **Runtime → T4 GPU**.
@@ -76,6 +83,10 @@ resumable: notes already on disk are skipped, only failures are retried. Set
 `istem_v1.txt` does not change once the experiment has started. If a change is needed, open
 `istem_v2.txt` and regenerate all 6 notes; notes from two versions are never mixed in the same
 table. `temperature = 0`.
+
+The results suggest one concrete v2 rule: summarise in the third person and never copy
+utterances verbatim. That is the fix for the `aci_003` echo; it must be applied to all six
+dialogues, not just the failing one.
 
 ## Demo integration (Person 4)
 
