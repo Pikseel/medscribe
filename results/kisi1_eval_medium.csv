@@ -1,0 +1,11 @@
+muayene,model,konusmaci_sayisi,cumle,dogruluk,kisa_n,kisa_dogruluk,uzun_n,uzun_dogruluk,dogru_n
+day1_consultation01,medium,2,125,0.952,52,0.923,73,0.973,119
+day1_consultation02,medium,2,98,0.939,40,0.875,58,0.983,92
+day1_consultation03,medium,2,108,0.981,40,0.975,68,0.985,106
+day1_consultation04,medium,2,84,0.964,19,0.895,65,0.985,81
+day1_consultation05,medium,2,106,1.0,30,1.0,76,1.0,106
+day1_consultation06,medium,2,103,0.942,44,0.955,59,0.932,97
+day1_consultation07,medium,2,90,0.956,28,0.929,62,0.968,86
+day1_consultation08,medium,2,125,0.968,55,0.945,70,0.986,121
+day1_consultation09,medium,2,117,0.991,49,0.98,68,1.0,116
+day1_consultation10,medium,2,108,0.954,34,0.971,74,0.946,103
