@@ -1,0 +1,647 @@
+{
+  "dialogue_id": "asr_001",
+  "source": "asr",
+  "reference_note": null,
+  "segments": [
+    {
+      "id": 0,
+      "start": 2.93,
+      "end": 3.23,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Hello."
+    },
+    {
+      "id": 1,
+      "start": 3.97,
+      "end": 5.23,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Hello, how are you?"
+    },
+    {
+      "id": 2,
+      "start": 6.03,
+      "end": 6.31,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Hi."
+    },
+    {
+      "id": 3,
+      "start": 6.89,
+      "end": 7.37,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Shall we stop?"
+    },
+    {
+      "id": 4,
+      "start": 7.85,
+      "end": 10.7,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, OK. Hello."
+    },
+    {
+      "id": 5,
+      "start": 10.71,
+      "end": 11.89,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "How can I help you this morning?"
+    },
+    {
+      "id": 6,
+      "start": 12.7,
+      "end": 13.36,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Hi."
+    },
+    {
+      "id": 7,
+      "start": 13.57,
+      "end": 17.46,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "I've just had some diarrhea for the last three days."
+    },
+    {
+      "id": 8,
+      "start": 19.1,
+      "end": 20.14,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And it's been affecting me."
+    },
+    {
+      "id": 9,
+      "start": 20.18,
+      "end": 22.08,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "I need to stay close to the toilet."
+    },
+    {
+      "id": 10,
+      "start": 22.32,
+      "end": 25.34,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And yeah, it's been affecting my day-to-day activities."
+    },
+    {
+      "id": 11,
+      "start": 26.56,
+      "end": 27.26,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Sorry to hear that."
+    },
+    {
+      "id": 12,
+      "start": 27.68,
+      "end": 30.36,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And when you say diarrhea, what do you mean by diarrhea?"
+    },
+    {
+      "id": 13,
+      "start": 30.38,
+      "end": 33.94,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Do you mean you're going to the toilet more often or are your stools more loose?"
+    },
+    {
+      "id": 14,
+      "start": 34.68,
+      "end": 43.59,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, so it's like loose and watery stool going to the toilet quite often and like some pain in my like lower stomach."
+    },
+    {
+      "id": 15,
+      "start": 44.01,
+      "end": 44.31,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay."
+    },
+    {
+      "id": 16,
+      "start": 44.71,
+      "end": 47.67,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And how many times a day are you going, let's say for the last couple of days?"
+    },
+    {
+      "id": 17,
+      "start": 48.33,
+      "end": 50.33,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Probably like six, seven times a day."
+    },
+    {
+      "id": 18,
+      "start": 50.65,
+      "end": 51.47,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Six, seven times a day."
+    },
+    {
+      "id": 19,
+      "start": 51.85,
+      "end": 53.8,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And you may have mentioned it's mainly watery."
+    },
+    {
+      "id": 20,
+      "start": 53.86,
+      "end": 56.06,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Have you noticed any other things like blood in your stools?"
+    },
+    {
+      "id": 21,
+      "start": 56.68,
+      "end": 57.44,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "No, no blood."
+    },
+    {
+      "id": 22,
+      "start": 57.52,
+      "end": 59.36,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, just watery and loose stall."
+    },
+    {
+      "id": 23,
+      "start": 59.7,
+      "end": 60.0,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay."
+    },
+    {
+      "id": 24,
+      "start": 60.28,
+      "end": 62.32,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And you mentioned you've had some pain in your tummy as well."
+    },
+    {
+      "id": 25,
+      "start": 62.9,
+      "end": 63.1,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yep."
+    },
+    {
+      "id": 26,
+      "start": 63.38,
+      "end": 64.82,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Whereabouts is the pain?"
+    },
+    {
+      "id": 27,
+      "start": 65.72,
+      "end": 67.08,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "In my lower abdomen."
+    },
+    {
+      "id": 28,
+      "start": 67.18,
+      "end": 70.84,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "So like, um, yeah, just to one side."
+    },
+    {
+      "id": 29,
+      "start": 71.46,
+      "end": 71.82,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "One side."
+    },
+    {
+      "id": 30,
+      "start": 71.84,
+      "end": 72.68,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And what side is that?"
+    },
+    {
+      "id": 31,
+      "start": 73.48,
+      "end": 74.34,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Uh, on the left side."
+    },
+    {
+      "id": 32,
+      "start": 74.9,
+      "end": 75.32,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay."
+    },
+    {
+      "id": 33,
+      "start": 75.58,
+      "end": 77.56,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Then can you describe the pain to me?"
+    },
+    {
+      "id": 34,
+      "start": 78.36,
+      "end": 84.22,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, it feels like a cramp, uh, like a muscular cramp and, um,"
+    },
+    {
+      "id": 35,
+      "start": 84.59,
+      "end": 86.57,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, I feel a bit weak and shaky."
+    },
+    {
+      "id": 36,
+      "start": 86.99,
+      "end": 87.35,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay."
+    },
+    {
+      "id": 37,
+      "start": 87.69,
+      "end": 90.51,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And is there pain all the time or does it come and go?"
+    },
+    {
+      "id": 38,
+      "start": 90.53,
+      "end": 92.71,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "It comes and goes."
+    },
+    {
+      "id": 39,
+      "start": 93.01,
+      "end": 96.58,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Does the pain move anywhere else, for example towards your back?"
+    },
+    {
+      "id": 40,
+      "start": 96.75,
+      "end": 98.76,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "No, just mainly in my stomach."
+    },
+    {
+      "id": 41,
+      "start": 99.26,
+      "end": 100.12,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay, fine."
+    },
+    {
+      "id": 42,
+      "start": 100.46,
+      "end": 102.62,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And you mentioned you've been feeling quite weak and shaky as well."
+    },
+    {
+      "id": 43,
+      "start": 102.64,
+      "end": 103.54,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "What do you mean by shaky?"
+    },
+    {
+      "id": 44,
+      "start": 103.56,
+      "end": 106.64,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Do you mean you've been feeling feverish, for example?"
+    },
+    {
+      "id": 45,
+      "start": 107.54,
+      "end": 110.84,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Um, yeah, it doesn't feel like, uh, yeah, I just make me feel weak."
+    },
+    {
+      "id": 46,
+      "start": 110.86,
+      "end": 116.98,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "I haven't had a fever, um, at the moment, but I did notice, um, a temperature when the symptoms started."
+    },
+    {
+      "id": 47,
+      "start": 117.12,
+      "end": 120.69,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "So, um, yeah, around about three or four days ago."
+    },
+    {
+      "id": 48,
+      "start": 121.13,
+      "end": 122.11,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "You measure your temperature then?"
+    },
+    {
+      "id": 49,
+      "start": 123.01,
+      "end": 123.71,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah."
+    },
+    {
+      "id": 50,
+      "start": 123.79,
+      "end": 126.85,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "I didn't measure my temperature, no, but I felt, um, just a bit hot."
+    },
+    {
+      "id": 51,
+      "start": 127.43,
+      "end": 128.11,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay."
+    },
+    {
+      "id": 52,
+      "start": 128.85,
+      "end": 135.29,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Any other symptoms like sweating or, um, no, no, and, uh, any vomiting at all?"
+    },
+    {
+      "id": 53,
+      "start": 135.98,
+      "end": 142.26,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, so I vomited at the start of the symptoms, but now I've stopped vomiting."
+    },
+    {
+      "id": 54,
+      "start": 143.3,
+      "end": 148.84,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And was your vomit, I know it's not nice to talk about, but was it just normal food colour?"
+    },
+    {
+      "id": 55,
+      "start": 149.58,
+      "end": 151.14,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Yeah, just normal vomit."
+    },
+    {
+      "id": 56,
+      "start": 151.78,
+      "end": 153.7,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And there was no blood in your vomit, is that right?"
+    },
+    {
+      "id": 57,
+      "start": 153.72,
+      "end": 156.18,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "No blood, no."
+    },
+    {
+      "id": 58,
+      "start": 156.76,
+      "end": 158.84,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "And any other symptoms at all?"
+    },
+    {
+      "id": 59,
+      "start": 158.86,
+      "end": 161.84,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "So you mentioned tummy pain, you mentioned diarrhea, you mentioned your vomiting."
+    },
+    {
+      "id": 60,
+      "start": 162.82,
+      "end": 164.04,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Anything else that comes to mind?"
+    },
+    {
+      "id": 61,
+      "start": 165.23,
+      "end": 172.4,
+      "speaker": "SPEAKER_01",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "I had a loss of appetite, so I haven't been eating as much, but I've been able to hold down fluids."
+    },
+    {
+      "id": 62,
+      "start": 173.58,
+      "end": 175.4,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "Okay, so you're drinking fluids."
+    },
+    {
+      "id": 63,
+      "start": 175.82,
+      "end": 177.99,
+      "speaker": "SPEAKER_00",
+      "gold_role": null,
+      "role": null,
+      "role_prob": null,
+      "text": "What kind of foods have you managed to eat, anything?"
+    }
+  ]
+}
