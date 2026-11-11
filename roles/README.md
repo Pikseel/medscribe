@@ -57,3 +57,20 @@ Notebook veri indirme, eğitim, değerlendirme ve örnek tahmin adımlarını s�
 çalıştırır. Eğitim/test ayrımı görüşme kimliğine göre yapılır; aynı görüşmenin
 metni iki tarafa sızmaz. Ana rapor değeri, tek bir şanslı bölünmeye bağlı
 kalmamak için 5-fold ortalama accuracy ve macro-F1 değerleridir.
+
+## Sunum
+
+```bash
+roles/.venv/bin/python -m roles.build_slides
+```
+
+Komut aynı tasarım dilinde üç Kişi 2 slaydı üretir:
+
+- yöntem ve sayısal model özellikleri,
+- 5-fold cross-validation ile holdout karşılaştırması,
+- Kişi 1 ASR çıktısı üzerinde uçtan uca entegrasyon.
+
+`results/kisi2_slides.pptx` yalnızca rol modülünü içerir.
+`results/medscribe_slides.pptx`, 11 slaytlık güncel ara sunumdaki tek Kişi 2
+taslağını bu üç doğrulanmış slaytla değiştiren 13 slaytlık birleşik sunumdur.
+Kişi 4'ün `medscribe_interim.pptx` kaynak sunumu değiştirilmez.
