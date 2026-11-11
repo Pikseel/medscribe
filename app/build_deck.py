@@ -146,7 +146,7 @@ def s1_rq(prs, rouge):
     para(tb.text_frame, False, [(f"ROUGE-L {rmean(rouge, 'rollu', 'rougeL'):.3f} with labels vs "
                                  f"{rmean(rouge, 'rolsuz', 'rougeL'):.3f} without", TITLE_FONT, 18, True, WHITE)],
          space_before=6)
-    para(tb.text_frame, False, [("3 dev dialogues, Qwen2.5-7B, same prompt. Labels fixed a negation "
+    para(tb.text_frame, False, [("3 exploratory train dialogues, Qwen2.5-7B, same prompt. Labels fixed a negation "
                                  "error but made the model echo the longest transcript: errors moved, "
                                  "they did not disappear.", BODY_FONT, 12.5, False, SOFT)], space_before=8,
          line_spacing=1.1)
@@ -217,7 +217,7 @@ def s3_data(prs, ev, asr):
             ["train  ·  train.csv", c["train"]["encounters"], c["train"]["speakers"], f"{c['train']['utterances']:,}",
              "role model training"],
             ["dev  ·  valid.csv", c["dev"]["encounters"], c["dev"]["speakers"], f"{c['dev']['utterances']:,}",
-             "model choice"],
+             "development check"],
             ["test  ·  taskB_test1.csv", c["test"]["encounters"], c["test"]["speakers"], f"{c['test']['utterances']:,}",
              "frozen, run once"]]
     table(s, 0.55, 1.75, [3.1, 1.35, 1.35, 1.4, 2.4], rows, row_h=0.48, size=12, bold_rows=(3,))
@@ -284,13 +284,15 @@ def s6_baseline(prs, ev, cv):
     rows = [["System (speaker level)", "dev  (20 enc.)", "test  (40 enc.)  [95% CI]"],
             ["First speaker is the doctor", pct(r["first_speaker"]["dev"]["accuracy"]), ci(r["first_speaker"]["test"])],
             ["More “you / your” is the doctor", pct(r["you_ratio"]["dev"]["accuracy"]), ci(r["you_ratio"]["test"])],
-            ["TF-IDF + LR, ours", pct(r["tfidf_lr"]["dev"]["accuracy"]), ci(r["tfidf_lr"]["test"])],
-            ["TF-IDF + LR, one utterance at a time", pct(r["utterance_tfidf_lr"]["dev"]["accuracy"]),
-             ci(r["utterance_tfidf_lr"]["test"])]]
+            ["TF-IDF + LR on speaker documents, ours", pct(r["tfidf_lr"]["dev"]["accuracy"]), ci(r["tfidf_lr"]["test"])],
+            ["Ablation: per-utterance model, mean per speaker",
+             pct(r["utterance_model_speaker_mean"]["dev"]["accuracy"]), ci(r["utterance_model_speaker_mean"]["test"])]]
     table(s, 0.55, 1.7, [4.2, 1.9, 3.3], rows, row_h=0.55, size=12.5, bold_rows=(3,))
     lines(s, 0.55, 4.6, 9.4, 0.9, [
-        f"Spread: 95% bootstrap interval over test encounters (2,000 resamples, seed 0). On train, "
-        f"5-fold grouped CV gives {cv['accuracy_mean'] * 100:.1f} ± {cv['accuracy_std'] * 100:.1f}.",
+        f"Spread: 95% bootstrap over test encounters (2,000 resamples, seed 0). On train, 5-fold grouped "
+        f"CV gives {cv['accuracy_mean'] * 100:.1f} ± {cv['accuracy_std'] * 100:.1f}. Ablation in its own unit: "
+        f"{ci(r['utterance_tfidf_lr']['test'])} of {ev['counts']['test']['utterances']:,} single utterances "
+        "(encounter-cluster bootstrap); not comparable with the rows above.",
     ], size=11, color=MUTED)
     card(s, 10.2, 1.7, 2.55, 2.75, fill=INK)
     tb = textbox(s, 10.35, 1.82, 2.3, 2.55)
@@ -300,21 +302,21 @@ def s6_baseline(prs, ev, cv):
     card(s, 0.55, 5.4, 12.2, 1.55, accent=MINT)
     label(s, 0.8, 5.5, 11, "WHAT THIS MEANS")
     lines(s, 0.8, 5.85, 11.7, 1.1, [
-        "Our model ties a one-line rule on ACI-Bench, so a clean transcript is not where it is needed. "
-        "One utterance alone is only 86.8% right: pooling a speaker's turns is what makes the task easy. "
-        "The real test is diarized ASR output, where the turn order is wrong for short turns.",
+        "On clean ACI-Bench transcripts our model ties a one-line rule. Single utterances are wrong 13% of "
+        "the time, yet deciding per speaker gets 39/40 encounters right: the decision unit matters. Not yet "
+        "tested: diarized ASR output, where speaker attribution is often wrong for short turns.",
     ], size=12, gap=4)
     notes(s, "Slide 6 (~75 s, Yusuf): Test set is ACI-Bench task B test 1, 40 encounters, run "
              "once. Our TF-IDF model gets 97.5%, the same as a rule that picks the speaker who "
-             "says 'you' more; first speaker gets 95%. Per utterance the same features give 86.8%. "
-             "So pooling per speaker is the useful part, and we need harder input to separate the "
-             "systems.")
+             "says 'you' more; first speaker gets 95%. The per-utterance ablation is "
+             "86.8% of utterances, a different unit; averaged per speaker it is again 39/40. So the "
+             "decision per speaker is what matters, and we need diarized input to separate the systems.")
 
 
 def s7_errors(prs, ev):
     e = ev["utterance_errors_test"]
     total_utts = ev["counts"]["test"]["utterances"]
-    s = base(prs, "ERROR ANALYSIS  ·  TEST SET", f"{e['total']} utterance-level errors, grouped")
+    s = base(prs, "ERROR ANALYSIS  ·  TEST SET  ·  PER-UTTERANCE ABLATION MODEL", f"Per-utterance ablation: {e['total']} errors, grouped")
     cats = list(e["by_category"].items())
     data = CategoryChartData()
     data.categories = [c for c, _ in cats][::-1]
@@ -338,8 +340,8 @@ def s7_errors(prs, ev):
     ch.category_axis.format.line.fill.background()
     ch.category_axis.tick_labels.font.color.rgb = INK
     lines(s, 0.55, 5.25, 6.3, 0.5, [f"{e['total']} of {total_utts:,} test utterances "
-                                     f"({e['total'] / total_utts * 100:.1f}%); rule-based categories, "
-                                     "full list in results/kisi4_utterance_errors.csv"], size=10, color=MUTED)
+                                     f"({e['total'] / total_utts * 100:.1f}%), rule-based categories. The system's "
+                                     "speaker-level model misses 1 of 40 encounters."], size=10, color=MUTED)
     card(s, 7.1, 1.6, 5.65, 4.1)
     label(s, 7.35, 1.72, 5.2, "ONE EXAMPLE PER CATEGORY")
     tf = textbox(s, 7.35, 2.08, 5.25, 3.55).text_frame
@@ -354,7 +356,7 @@ def s7_errors(prs, ev):
         "Backchannels (“okay.”) carry no role signal → never decide per utterance, pool per speaker. "
         "Patients also say “you” and ask questions → the “you” rule and question counts break on short "
         "or role-reversed dialogues."], size=11.5)
-    notes(s, "Slide 7 (~60 s): 269 errors when every utterance is classified alone. The biggest "
+    notes(s, "Slide 7 (~60 s): These are the errors of the per-utterance ablation model, not of the speaker-level model we use (that one misses 1 of 40 encounters). 269 errors when every utterance is classified alone. The biggest "
              "group is short backchannels like 'okay', which no text model can place. Patients "
              "addressing the doctor with 'you' and asking questions are next: these are also the "
              "cases that would break the simple rule baselines. Categories are assigned by rules; "
@@ -362,13 +364,13 @@ def s7_errors(prs, ev):
 
 
 def s9_experiment(prs, rouge):
-    s = base(prs, "METHOD STATUS  ·  FIRST NUMBERS ON DEV", "With roles vs without: same model, same prompt")
+    s = base(prs, "METHOD STATUS  ·  FIRST NUMBERS (EXPLORATORY)", "With roles vs without: same model, same prompt")
     rows = [["ROUGE vs reference note", "R-1", "R-2", "R-L"]]
     for cond, name in (("rolsuz", "Without labels (baseline)"), ("rollu", "With Doctor/Patient labels")):
         rows.append([name] + [f"{rmean(rouge, cond, m):.3f}" for m in ("rouge1", "rouge2", "rougeL")])
     table(s, 0.55, 1.7, [3.6, 1.1, 1.1, 1.1], rows, row_h=0.5, size=12.5)
-    lines(s, 0.55, 3.3, 6.9, 0.6, ["Mean of 3 dialogues (D2N050, D2N053, D2N060 from the train split), "
-                                   "Qwen2.5-7B-Instruct 4-bit, temperature 0, frozen prompt v1."],
+    lines(s, 0.55, 3.3, 6.9, 0.6, ["Mean of 3 exploratory dialogues from the train split (D2N050, D2N053, D2N060), not the dev "
+                                   "set. Qwen2.5-7B-Instruct 4-bit, temperature 0, frozen prompt v1."],
           size=10.5, color=MUTED)
     card(s, 0.55, 4.05, 6.9, 2.9, accent=TEAL)
     label(s, 0.8, 4.17, 6.4, "ONE CONTROLLED CHANGE")
@@ -387,7 +389,7 @@ def s9_experiment(prs, rouge):
     for i, (h, d) in enumerate(items):
         para(tf, i == 0, [(h, BODY_FONT, 13, True, INK)], space_before=0 if i == 0 else 10)
         para(tf, False, [(d, BODY_FONT, 11.5, False, MUTED)], line_spacing=1.08)
-    notes(s, "Slide 9 (~60 s, Ali): First numbers on three development dialogues. Without labels "
+    notes(s, "Slide 9 (~60 s, Ali): First numbers on three exploratory train dialogues, not the dev set. Without labels "
              "is our baseline, with labels is the method; the transcript is the only change. ROUGE "
              "is flat. Reading the notes, labels fixed a negation error but caused an echo on the "
              "longest dialogue. ROUGE cannot see these errors, so the final uses error counts too.")
@@ -456,20 +458,21 @@ def project_card(prs, ev, cv, asr, rouge):
             "anonymous speakers. We train a text-based role classifier (TF-IDF + logistic regression; "
             f"{pct(r['tfidf_lr']['test']['accuracy'])} speaker accuracy on the frozen ACI-Bench test) and test whether "
             "Doctor/Patient labels change the note an open LLM (Qwen2.5-7B) writes from the same transcript. "
-            "On three development dialogues, labels did not change ROUGE (R-L "
+            "On three exploratory train dialogues, labels did not change ROUGE (R-L "
             f"{rl('rollu')} vs {rl('rolsuz')}) but shifted the error types. On the 40-dialogue test set, labels "
             "[RESULT: ROUGE / BERTScore / attribution errors, with vs without vs anonymous A/B]. (≈120 words)"]),
         (2, "Research question", 1.45, [
             "Do Doctor/Patient speaker labels make an LLM write a better SOAP note? First result: no, not on "
-            "average (3 dev dialogues). Changed: the proposal was a 5-stage system with no single question; "
+            "average (3 exploratory train dialogues). Changed: the proposal was a 5-stage system with no single question; "
             "narrowed after feedback (NER, fine-tuning, Turkish data dropped)."]),
         (3, "Contributions (testable claims)", 2.05, [
             "C1. Labels reduce attribution errors (negation flips, questions written as complaints) on the "
             "40 test dialogues, even when ROUGE is unchanged.",
             "C2. Most of any gain comes from turn structure: anonymous A/B labels close at least half of the gap "
             "between no speaker info and roles.",
-            "C3. Pooling a speaker's turns, not per-utterance classification, is what makes role assignment "
-            f"accurate ({pct(r['utterance_tfidf_lr']['test']['accuracy'])} → {pct(r['tfidf_lr']['test']['accuracy'])})."]),
+            "C3. Role decisions must be made per speaker: the per-utterance model is wrong on "
+            f"{100 - r['utterance_tfidf_lr']['test']['accuracy'] * 100:.0f}% of test utterances, yet averaging its "
+            f"scores per speaker gets {pct(r['utterance_model_speaker_mean']['test']['accuracy'])} of encounters right."]),
     ])
     card_slide(prs, 2, [
         (4, "Related work (how we differ)", 3.05, [
@@ -497,7 +500,8 @@ def project_card(prs, ev, cv, asr, rouge):
         (6, "Method and baseline", 1.45, [
             "Baseline: note from the transcript without speaker labels. Method: same transcript with Doctor/"
             "Patient labels from our classifier (gold labels for the controlled run). The one change: the labels.",
-            "Compute used: 1 Colab T4, ~1–2 min per note (4-bit 7B); roles on CPU in ~5 s. Needed: ~4 T4-hours "
+            "Compute used: 1 Colab T4, ~1–2 min per note (4-bit 7B); roles: 2.15 ms warm inference, ~1–2.6 s with "
+            "Python start-up and model loading (tested Mac). Needed: ~4 T4-hours "
             "for 40 dialogues × 3 conditions."]),
         (7, "Evaluation protocol (fixed before method results)", 1.4, [
             "Metrics: ROUGE-1/2/L, BERTScore vs reference note; attribution-error count per note (checklist). "
@@ -506,7 +510,7 @@ def project_card(prs, ev, cv, asr, rouge):
         (8, "Results so far (final table)", 3.0, []),
     ])
     s = prs.slides[-1]
-    rows = [["System", "Roles: speaker acc. (test)", "Note R-L (dev, n=3)", "Note R-L (test, n=40)", "Attribution errors"],
+    rows = [["System", "Roles: speaker acc. (test)", "Note R-L (train, n=3)", "Note R-L (test, n=40)", "Attribution errors"],
             ["First speaker rule", ci(r["first_speaker"]["test"]), "–", "–", "–"],
             ["TF-IDF + LR roles (ours)", ci(r["tfidf_lr"]["test"]), "–", "–", "–"],
             ["Note, no speaker info (baseline)", "–", rl("rolsuz"), "", ""],
@@ -516,7 +520,7 @@ def project_card(prs, ev, cv, asr, rouge):
 
     card_slide(prs, 4, [
         (9, "Error analysis", 1.45, [
-            f"{ev['utterance_errors_test']['total']} test errors of the per-utterance role model, grouped: " +
+            f"Per-utterance ablation model (not the system's speaker-level model, which misses 1/40): {ev['utterance_errors_test']['total']} test errors, grouped: " +
             "; ".join(f"{c.split(' (')[0]} {n}" for c, n in ev["utterance_errors_test"]["by_category"].items()) +
             ". Example: “okay.” (short backchannel). Notes: 1 echo, 1 negation-scope, 1 number, 1 added fact (6 notes)."]),
         (10, "Research lead section", 1.35, [

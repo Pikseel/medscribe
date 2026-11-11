@@ -98,18 +98,44 @@
       "dev": {
         "accuracy": 0.8537549407114624,
         "ci95": [
-          0.8330039525691699,
-          0.8735177865612648
+          0.7632075471698113,
+          0.9166666666666666
         ],
-        "n_utterances": 1012
+        "n_utterances": 1012,
+        "unit": "utterance; encounter-cluster bootstrap"
       },
       "test": {
         "accuracy": 0.8676181102362205,
         "ci95": [
-          0.8528543307086615,
-          0.8823818897637795
+          0.8268493150684931,
+          0.9042612064194798
         ],
-        "n_utterances": 2032
+        "n_utterances": 2032,
+        "unit": "utterance; encounter-cluster bootstrap"
+      }
+    },
+    "utterance_model_speaker_mean": {
+      "dev": {
+        "accuracy": 0.95,
+        "ci95": [
+          0.85,
+          1.0
+        ],
+        "n_encounters": 20,
+        "errors": [
+          "D2N082"
+        ]
+      },
+      "test": {
+        "accuracy": 0.975,
+        "ci95": [
+          0.925,
+          1.0
+        ],
+        "n_encounters": 40,
+        "errors": [
+          "D2N114"
+        ]
       }
     }
   },
