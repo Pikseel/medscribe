@@ -1,0 +1,73 @@
+{
+  "group_5fold": {
+    "accuracy_scores": [
+      0.9285714285714286,
+      0.9285714285714286,
+      1.0,
+      0.8461538461538461,
+      0.9230769230769231
+    ],
+    "accuracy_mean": 0.9252747252747253,
+    "accuracy_std": 0.04872483357669311,
+    "macro_f1_scores": [
+      0.9285714285714286,
+      0.9285714285714286,
+      1.0,
+      0.8461538461538461,
+      0.9230769230769231
+    ],
+    "macro_f1_mean": 0.9252747252747253,
+    "macro_f1_std": 0.04872483357669311
+  },
+  "holdout": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "confusion_matrix_labels": [
+      "Doctor",
+      "Patient"
+    ],
+    "confusion_matrix": [
+      [
+        14,
+        0
+      ],
+      [
+        0,
+        14
+      ]
+    ],
+    "classification_report": {
+      "Doctor": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 14.0
+      },
+      "Patient": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 14.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 28.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 28.0
+      }
+    },
+    "train_speakers": 106,
+    "test_speakers": 28,
+    "train_encounters": 53,
+    "test_encounters": 14
+  },
+  "evaluation_unit": "one aggregated document per speaker",
+  "split_unit": "encounter_id"
+}
