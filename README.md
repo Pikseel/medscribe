@@ -27,13 +27,16 @@ generate_note(dialogue, role_field) -> note       # notes/generate_note.py  role
 Ortak JSON formatı `common/format.py` içinde tanımlı; her dosya `python -m common.format dosya.json` ile kontrol edilir.
 
 ## Sonuçları yeniden üretme (repo kökünden)
+
+Alan 8'deki rol sonuçlarını ve commitlenmiş altı dondurulmuş GPU notundan hesaplanan ROUGE değerlerini tek komutla yeniden üretir; ardından sunum kaynağını oluşturur:
+
 ```bash
-pip install scikit-learn joblib python-pptx rouge-score
-python -m roles.train_roles      # rol modeli -> roles/models/ (~10 sn)
-python -m eval.role_eval         # dondurulmuş test: results/kisi4_role_eval.json, kisi4_utterance_errors.csv
-python -m app.build_deck         # ara sunum: results/medscribe_midproject.pptx
+make reproduce
 ```
-SOAP notları GPU ister: `notes/colab_soap.ipynb` (Colab, T4) veya `python -m notes.generate_note --experiment`.
+
+Komut izole `.repro-venv` ortamını kurar, rol modelini eğitir, dondurulmuş test değerlendirmesini çalıştırır ve `results/medscribe_midproject.pptx` dosyasını üretir. İlk çalıştırmada açık ACI-Bench CSV dosyalarını indirir. SOAP notlarının yeniden üretilmesi bu komuta dahil değildir; GPU ister ve `notes/colab_soap.ipynb` (Colab, T4) ile yapılır.
+
+Doğrulanan CPU ortamı: Python 3.12.4; scikit-learn 1.9.1; numpy 2.5.4; scipy 1.18.1; joblib 1.6.0; python-pptx 1.0.2; rouge-score 0.1.2. Python bağımlılıkları `requirements.txt` içinde sabitlenmiştir.
 
 ## Demo
 Colab'da `app/demo_colab.ipynb` → Runtime: T4 GPU → Run all. Son hücre bir `gradio.live` linki verir.
@@ -42,4 +45,6 @@ Gerçek modüller yoksa demo otomatik olarak `common/mocks.py`'ye düşer; aray�
 
 ## Veri
 - ACI-Bench (CC BY 4.0): train 67 / dev 20 / test 40 görüşme (`clinicalnlp_taskB_test1`, dondurulmuş). `eval/` ve `roles/` ilk çalıştırmada indirir.
-- PriMock57 (CC BY 4.0): 20 görüşme, sadece konuşmacı ayırma ölçümü için.
+- PriMock57 (CC BY 4.0; resmi `LICENSE.md` doğrulandı): 20 görüşme, sadece konuşmacı ayırma ölçümü için.
+
+Tam kaynakça, DOI/URL'ler ve veri lisansı bağlantıları için [`REFERENCES.md`](REFERENCES.md) dosyasına bakın.

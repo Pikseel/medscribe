@@ -24,6 +24,8 @@ import csv
 import json
 import random
 import re
+import shutil
+import ssl
 import sys
 import urllib.request
 from collections import Counter
@@ -31,6 +33,7 @@ from pathlib import Path
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+import certifi
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -48,7 +51,12 @@ def load(split):
     path = RAW / f"{SPLITS[split]}.csv"
     if not path.exists():
         RAW.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(BASE + path.name, path)
+        # Python.org macOS installations may not inherit the Keychain CA store.
+        # Use certifi while keeping TLS verification enabled.
+        context = ssl.create_default_context(cafile=certifi.where())
+        with urllib.request.urlopen(BASE + path.name, context=context) as response:
+            with path.open("wb") as output:
+                shutil.copyfileobj(response, output)
     encs = []
     for row in csv.DictReader(path.open(encoding="utf-8")):
         utts = []

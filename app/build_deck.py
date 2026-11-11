@@ -146,7 +146,8 @@ def s1_rq(prs, rouge):
     para(tb.text_frame, False, [(f"ROUGE-L {rmean(rouge, 'rollu', 'rougeL'):.3f} with labels vs "
                                  f"{rmean(rouge, 'rolsuz', 'rougeL'):.3f} without", TITLE_FONT, 18, True, WHITE)],
          space_before=6)
-    para(tb.text_frame, False, [("3 exploratory train dialogues, Qwen2.5-7B, same prompt. Labels fixed a negation "
+    para(tb.text_frame, False, [("3 exploratory train dialogues; one deterministic run per condition, so no spread/CI. "
+                                 "Qwen2.5-7B, same prompt. Labels fixed a negation "
                                  "error but made the model echo the longest transcript: errors moved, "
                                  "they did not disappear.", BODY_FONT, 12.5, False, SOFT)], space_before=8,
          line_spacing=1.1)
@@ -370,7 +371,8 @@ def s9_experiment(prs, rouge):
         rows.append([name] + [f"{rmean(rouge, cond, m):.3f}" for m in ("rouge1", "rouge2", "rougeL")])
     table(s, 0.55, 1.7, [3.6, 1.1, 1.1, 1.1], rows, row_h=0.5, size=12.5)
     lines(s, 0.55, 3.3, 6.9, 0.6, ["Mean of 3 exploratory dialogues from the train split (D2N050, D2N053, D2N060), not the dev "
-                                   "set. Qwen2.5-7B-Instruct 4-bit, temperature 0, frozen prompt v1."],
+                                   "set. One deterministic run per condition: n=3, no spread/CI. "
+                                   "Qwen2.5-7B-Instruct 4-bit, temperature 0, frozen prompt v1."],
           size=10.5, color=MUTED)
     card(s, 0.55, 4.05, 6.9, 2.9, accent=TEAL)
     label(s, 0.8, 4.17, 6.4, "ONE CONTROLLED CHANGE")
@@ -458,7 +460,7 @@ def project_card(prs, ev, cv, asr, rouge):
             "anonymous speakers. We train a text-based role classifier (TF-IDF + logistic regression; "
             f"{pct(r['tfidf_lr']['test']['accuracy'])} speaker accuracy on the frozen ACI-Bench test) and test whether "
             "Doctor/Patient labels change the note an open LLM (Qwen2.5-7B) writes from the same transcript. "
-            "On three exploratory train dialogues, labels did not change ROUGE (R-L "
+            "On three exploratory train dialogues (one deterministic run per condition; no spread/CI), labels did not change ROUGE (R-L "
             f"{rl('rollu')} vs {rl('rolsuz')}) but shifted the error types. On the 40-dialogue test set, labels "
             "[RESULT: ROUGE / BERTScore / attribution errors, with vs without vs anonymous A/B]. (≈120 words)"]),
         (2, "Research question", 1.45, [
@@ -476,24 +478,20 @@ def project_card(prs, ev, cv, asr, rouge):
     ])
     card_slide(prs, 2, [
         (4, "Related work (how we differ)", 3.05, [
-            "Krishna et al., ACL-IJCNLP 2021 — Generating SOAP notes from doctor–patient conversations using "
-            "modular summarization. Fine-tuned extract-then-abstract; we prompt an open LLM and isolate role labels.",
-            "Yim et al., Scientific Data 2023 — ACI-BENCH. Benchmark we use; we add a role-label ablation on it.",
-            "Ben Abacha et al., EACL 2023 — An empirical study of clinical note generation (MTS-Dialog). Section "
-            "generation; we study one input factor, speaker roles.",
-            "Ben Abacha et al., ClinicalNLP 2023 — Overview of MEDIQA-Chat 2023. Shared task systems; none "
-            "separates the effect of role tags.",
-            "Korfiatis et al., ACL 2022 — PriMock57. Audio corpus we use only for speaker separation.",
-            "Bain et al., Interspeech 2023 — WhisperX; Bredin et al., ICASSP 2020 — pyannote. Tools we use "
-            "as is; we solve the role mapping they leave open."]),
+            "Krishna et al. (2021), ACL-IJCNLP, pp. 4958–4972, doi:10.18653/v1/2021.acl-long.384 — modular SOAP summarization; we isolate role labels.",
+            "Yim et al. (2023), Scientific Data 10:586, doi:10.1038/s41597-023-02487-3 — ACI-BENCH; we add a role-label ablation.",
+            "Ben Abacha et al. (2023), EACL, pp. 2291–2302, doi:10.18653/v1/2023.eacl-main.168 — section generation; we study speaker roles.",
+            "Ben Abacha et al. (2023), ClinicalNLP, pp. 503–513, doi:10.18653/v1/2023.clinicalnlp-1.52 — shared task; no isolated role-tag test.",
+            "Korfiatis et al. (2022), ACL, pp. 588–598, doi:10.18653/v1/2022.acl-short.65 — PriMock57, used only for speaker separation.",
+            "Radford et al. (2023), ICML/PMLR 202:28492–28518 — Whisper; Bain et al. (2023), Interspeech — WhisperX. Full URLs: REFERENCES.md."]),
         (5, "Data", 2.4, [
             f"ACI-Bench, CC BY 4.0. As loaded: train {ev['counts']['train']['encounters']} enc. / "
             f"{ev['counts']['train']['utterances']:,} utt.; dev {ev['counts']['dev']['encounters']} / "
             f"{ev['counts']['dev']['utterances']:,}; test (clinicalnlp_taskB_test1, frozen) "
             f"{ev['counts']['test']['encounters']} / {ev['counts']['test']['utterances']:,}.",
             "Preprocessing: [patient_guest] lines dropped (dev 38, test 50); encounters unchanged.",
-            f"PriMock57, CC BY 4.0: 20 consultations, first 5 min, {asr['total']:,} "
-            "utterances. Example: [doctor] have you … noticed any rashes? / [patient] on my body no not really.",
+            f"PriMock57, CC BY 4.0 (official LICENSE.md verified): 20 consultations, first 5 min, {asr['total']:,} utterances.",
+            "ACI-Bench example: [doctor] have you … noticed any rashes? / [patient] on my body no not really.",
             "No data labelled by us yet; the attribution-error checklist will report agreement on 10 notes."]),
     ])
     card_slide(prs, 3, [
@@ -511,29 +509,32 @@ def project_card(prs, ev, cv, asr, rouge):
     ])
     s = prs.slides[-1]
     rows = [["System", "Roles: speaker acc. (test)", "Note R-L (train, n=3)", "Note R-L (test, n=40)", "Attribution errors"],
-            ["First speaker rule", ci(r["first_speaker"]["test"]), "–", "–", "–"],
-            ["TF-IDF + LR roles (ours)", ci(r["tfidf_lr"]["test"]), "–", "–", "–"],
-            ["Note, no speaker info (baseline)", "–", rl("rolsuz"), "", ""],
-            ["Note, anonymous A/B", "–", "", "", ""],
-            ["Note, Doctor/Patient labels", "–", rl("rollu"), "", ""]]
+            ["First speaker rule", ci(r["first_speaker"]["test"]), "N/A", "N/A", "N/A"],
+            ["TF-IDF + LR roles (ours)", ci(r["tfidf_lr"]["test"]), "N/A", "N/A", "N/A"],
+            ["Note, no speaker info (baseline)", "N/A", rl("rolsuz") + " (no CI)", "not run yet", "not run yet"],
+            ["Note, anonymous A/B", "N/A", "not run yet", "not run yet", "not run yet"],
+            ["Note, Doctor/Patient labels", "N/A", rl("rollu") + " (no CI)", "not run yet", "not run yet"]]
     table(s, 1.3, 4.55, [3.0, 2.4, 1.75, 1.8, 2.0], rows, row_h=0.33, size=10)
 
     card_slide(prs, 4, [
         (9, "Error analysis", 1.45, [
             f"Per-utterance ablation model (not the system's speaker-level model, which misses 1/40): {ev['utterance_errors_test']['total']} test errors, grouped: " +
             "; ".join(f"{c.split(' (')[0]} {n}" for c, n in ev["utterance_errors_test"]["by_category"].items()) +
-            ". Example: “okay.” (short backchannel). Notes: 1 echo, 1 negation-scope, 1 number, 1 added fact (6 notes)."]),
+            ". Example: “okay.” (short backchannel). Notes: 1 echo, 1 negation-scope, 1 number, 1 added fact (6 exploratory notes). "
+            "The frozen-test note baseline/error analysis has not run yet; these 269 errors must not be read as its errors."]),
         (10, "Research lead section", 1.35, [
-            "Research lead: the notes and experiment lead (slide 2), who owns the research question. Two recent papers: ACI-BENCH (Yim et al. 2023) and MEDIQA-Chat 2023 "
+            "Research lead: Ali Iskif — notes and experiment lead. Two recent papers: ACI-BENCH (Yim et al. 2023) and MEDIQA-Chat 2023 "
             "(Ben Abacha et al.); both report note quality without isolating speaker labels. We run the "
             "ablation no-speaker / anonymous A/B / roles."]),
         (11, "Plan and risk", 1.4, [
             "; ".join(f"{a} — {o}, {d}" for a, o, d in PLAN[:4]) + "; …(full list on slide 10). Risk: ROUGE "
             "blind to attribution errors → fallback checklist. Feedback response: scope narrowed to one question."]),
         (12, "Reproducibility", 1.65, [
-            f"Repo: {REPO}.  Field 8: python -m eval.role_eval (roles) and python -m notes.generate_note "
-            "--experiment (notes, needs GPU). Seeds: bootstrap 0, LLM temperature 0. Versions: Python 3.12, "
-            "scikit-learn ≥1.4, transformers + bitsandbytes (Colab), WhisperX.",
+            f"Repo: {REPO}. One command for Field 8 + this deck: make reproduce. It reruns CPU role metrics and "
+            "recomputes note ROUGE from the six committed frozen GPU outputs; it does not regenerate notes. "
+            "Seeds: bootstrap 0, LR 42, LLM temperature 0.",
+            "Tested CPU environment: Python 3.12.4; scikit-learn 1.9.1; numpy 2.5.4; scipy 1.18.1; "
+            "joblib 1.6.0; python-pptx 1.0.2; rouge-score 0.1.2. Full GPU regeneration: notes/colab_soap.ipynb.",
             "Who did what: one module per member, as on slide 2 — ASR lead: speech → text; roles lead: role "
             "classifier; notes lead: notes and experiment; demo lead: shared format, demo, evaluation, slides. "
             "AI tools: Claude (Anthropic) for planning, code scaffolding, evaluation scripts and slide drafts; "
@@ -546,12 +547,12 @@ SWAP = {"PERSON 2": "STEP 2", "PERSON 3": "STEP 3", "Person 2 · ": "", "Person 
 
 
 def strip_names(prs):
-    """Names stay on slides 1-2 only (team decision); later slides use module roles."""
+    """Names stay on slides 1-2 and Field 10, where the rubric requires the lead's name."""
     for i, s in enumerate(prs.slides):
         if s.has_notes_slide:
             tf = s.notes_slide.notes_text_frame
             tf.text = NAMES.sub("", tf.text)
-        if i < 2:
+        if i < 2 or i == len(prs.slides) - 1:
             continue
         for sh in s.shapes:
             if not sh.has_text_frame:
