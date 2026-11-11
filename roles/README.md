@@ -70,7 +70,5 @@ Komut aynı tasarım dilinde üç Kişi 2 slaydı üretir:
 - 5-fold cross-validation ile holdout karşılaştırması,
 - Kişi 1 ASR çıktısı üzerinde uçtan uca entegrasyon.
 
-`results/kisi2_slides.pptx` yalnızca rol modülünü içerir.
-`results/medscribe_slides.pptx`, 11 slaytlık güncel ara sunumdaki tek Kişi 2
-taslağını bu üç doğrulanmış slaytla değiştiren 13 slaytlık birleşik sunumdur.
-Kişi 4'ün `medscribe_interim.pptx` kaynak sunumu değiştirilmez.
+Çıktı `results/kisi2_slides.pptx` yereldir (repoda tutulmaz). Final sunumda
+yöntem slaytı `app/build_deck.py` içinden doğrudan kullanılır.

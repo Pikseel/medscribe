@@ -40,9 +40,7 @@ from notes.build_slides import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INTERIM_DECK = ROOT / "results" / "medscribe_interim.pptx"
 PERSON2_DECK = ROOT / "results" / "kisi2_slides.pptx"
-COMBINED_DECK = ROOT / "results" / "medscribe_slides.pptx"
 
 
 def _base(prs, eyebrow, title, subtitle):
@@ -306,26 +304,6 @@ def add_person2_slides(prs):
     slide_integration(prs)
 
 
-def _remove_slide(prs, index):
-    """Remove one slide and its presentation relationship."""
-    slide_id = prs.slides._sldIdLst[index]
-    relationship_id = slide_id.rId
-    prs.slides._sldIdLst.remove(slide_id)
-    prs.part.drop_rel(relationship_id)
-
-
-def _move_last_slides_to_index(prs, count, index):
-    """Place newly appended slides at a zero-based position."""
-    slide_ids = prs.slides._sldIdLst
-    current = list(slide_ids)
-    existing, appended = current[:-count], current[-count:]
-    reordered = existing[:index] + appended + existing[index:]
-    for slide_id in current:
-        slide_ids.remove(slide_id)
-    for slide_id in reordered:
-        slide_ids.append(slide_id)
-
-
 def _new_deck():
     prs = Presentation()
     prs.slide_width = Inches(13.333)
@@ -350,14 +328,6 @@ def main():
     person2 = _new_deck()
     add_person2_slides(person2)
     _save_and_report(person2, PERSON2_DECK)
-
-    combined = Presentation(INTERIM_DECK)
-    # Append first so python-pptx allocates slide12–14 without colliding with
-    # the existing slide11 part, then remove/reorder the draft.
-    add_person2_slides(combined)
-    _remove_slide(combined, 5)  # Replace the single draft Person 2 slide.
-    _move_last_slides_to_index(combined, 3, 5)
-    _save_and_report(combined, COMBINED_DECK)
 
 
 if __name__ == "__main__":
