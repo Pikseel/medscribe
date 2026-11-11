@@ -6,7 +6,7 @@ Every number is read from results/ files at build time:
     results/kisi2_role_metrics.json, results/kisi1_eval_small.csv, notes/outputs/*.json
 Reuses Person 2's method slide and Person 3's note slide unchanged.
 
-    python -m app.build_deck   ->  results/medscribe_midproject.pptx
+    python -m app.build_deck   ->  results/Team17_MidProject.pptx
 """
 import csv
 import re
@@ -134,7 +134,7 @@ def s1_rq(prs, rouge):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     rect(s, 0, 0, 13.333, 7.5, fill=INK)
     tb = textbox(s, 0.7, 0.45, 12, 0.35)
-    para(tb.text_frame, True, [("CSE 484 MID-PROJECT  ·  MEDSCRIBE", BODY_FONT, 12, True, MINT)])
+    para(tb.text_frame, True, [("CSE 484 MID-PROJECT  ·  TEAM 17  ·  MEDSCRIBE", BODY_FONT, 12, True, MINT)])
     label(s, 0.7, 1.05, 6, "RESEARCH QUESTION", color=SOFT)
     tb = textbox(s, 0.7, 1.4, 11.9, 1.4)
     para(tb.text_frame, True, [("Do Doctor / Patient speaker labels make an LLM write a "
@@ -582,7 +582,7 @@ def main():
     s10_plan(prs)
     project_card(prs, ev, cv, asr, rouge)
     strip_names(prs)
-    out = R("results", "medscribe_midproject.pptx")
+    out = R("results", "Team17_MidProject.pptx")
     prs.save(out)
     print("->", out, len(prs.slides._sldIdLst), "slides")
 

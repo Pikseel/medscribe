@@ -3,7 +3,9 @@
 Doktor–hasta konuşmasından konuşmacı rolü tespiti ve otomatik SOAP notu (CSE 484 NLP dersi projesi).
 
 **Araştırma sorusu:** Doctor/Patient konuşmacı etiketleri, bir LLM'in transkriptten yazdığı SOAP notunu iyileştiriyor mu?
-**Ara sunum:** [`results/MedScribe_MidProject.pdf`](results/MedScribe_MidProject.pdf) (10 slayt + 4 slayt Project Card).
+**Takım:** 17
+
+**Ara sunum:** [`results/Team17_MidProject.pdf`](results/Team17_MidProject.pdf) (10 slayt + 4 slayt Project Card).
 
 ## Klasörler
 | Klasör | Modül | İçerik |
@@ -34,7 +36,7 @@ Alan 8'deki rol sonuçlarını ve commitlenmiş altı dondurulmuş GPU notundan 
 make reproduce
 ```
 
-Komut izole `.repro-venv` ortamını kurar, rol modelini eğitir, dondurulmuş test değerlendirmesini çalıştırır ve `results/medscribe_midproject.pptx` dosyasını üretir. İlk çalıştırmada açık ACI-Bench CSV dosyalarını indirir. SOAP notlarının yeniden üretilmesi bu komuta dahil değildir; GPU ister ve `notes/colab_soap.ipynb` (Colab, T4) ile yapılır.
+Komut izole `.repro-venv` ortamını kurar, rol modelini eğitir, dondurulmuş test değerlendirmesini çalıştırır ve `results/Team17_MidProject.pptx` dosyasını üretir. İlk çalıştırmada açık ACI-Bench CSV dosyalarını indirir. SOAP notlarının yeniden üretilmesi bu komuta dahil değildir; GPU ister ve `notes/colab_soap.ipynb` (Colab, T4) ile yapılır.
 
 Doğrulanan CPU ortamı: Python 3.12.4; scikit-learn 1.9.1; numpy 2.5.4; scipy 1.18.1; joblib 1.6.0; python-pptx 1.0.2; rouge-score 0.1.2. Python bağımlılıkları `requirements.txt` içinde sabitlenmiştir.
 
