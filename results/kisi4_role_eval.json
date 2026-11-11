@@ -1,0 +1,135 @@
+{
+  "splits": {
+    "train": "train.csv",
+    "dev": "valid.csv",
+    "test": "clinicalnlp_taskB_test1.csv"
+  },
+  "counts": {
+    "train": {
+      "encounters": 67,
+      "speakers": 134,
+      "utterances": 3733
+    },
+    "dev": {
+      "encounters": 20,
+      "speakers": 40,
+      "utterances": 1012
+    },
+    "test": {
+      "encounters": 40,
+      "speakers": 80,
+      "utterances": 2032
+    }
+  },
+  "licence": "CC BY 4.0",
+  "results": {
+    "first_speaker": {
+      "dev": {
+        "accuracy": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "n_encounters": 20,
+        "errors": []
+      },
+      "test": {
+        "accuracy": 0.95,
+        "ci95": [
+          0.875,
+          1.0
+        ],
+        "n_encounters": 40,
+        "errors": [
+          "D2N121",
+          "D2N125"
+        ]
+      }
+    },
+    "you_ratio": {
+      "dev": {
+        "accuracy": 0.95,
+        "ci95": [
+          0.85,
+          1.0
+        ],
+        "n_encounters": 20,
+        "errors": [
+          "D2N082"
+        ]
+      },
+      "test": {
+        "accuracy": 0.975,
+        "ci95": [
+          0.925,
+          1.0
+        ],
+        "n_encounters": 40,
+        "errors": [
+          "D2N114"
+        ]
+      }
+    },
+    "tfidf_lr": {
+      "dev": {
+        "accuracy": 0.95,
+        "ci95": [
+          0.85,
+          1.0
+        ],
+        "n_encounters": 20,
+        "errors": [
+          "D2N082"
+        ]
+      },
+      "test": {
+        "accuracy": 0.975,
+        "ci95": [
+          0.925,
+          1.0
+        ],
+        "n_encounters": 40,
+        "errors": [
+          "D2N114"
+        ]
+      }
+    },
+    "utterance_tfidf_lr": {
+      "dev": {
+        "accuracy": 0.8537549407114624,
+        "ci95": [
+          0.8330039525691699,
+          0.8735177865612648
+        ],
+        "n_utterances": 1012
+      },
+      "test": {
+        "accuracy": 0.8676181102362205,
+        "ci95": [
+          0.8528543307086615,
+          0.8823818897637795
+        ],
+        "n_utterances": 2032
+      }
+    }
+  },
+  "seed": 0,
+  "bootstrap_resamples": 2000,
+  "utterance_errors_test": {
+    "total": 269,
+    "by_category": {
+      "short backchannel (<=3 words)": 97,
+      "other / content overlap": 85,
+      "patient addresses the doctor ('you')": 42,
+      "doctor speaks in first person (no 'you')": 27,
+      "patient asks a question": 18
+    },
+    "examples": {
+      "doctor speaks in first person (no 'you')": "i'm doing well , i'm doing well .",
+      "other / content overlap": "u- u- um , maybe not necessarily . maybe in a , uh , few months we'll check on that .",
+      "patient asks a question": "i'm doing well . how are you ?",
+      "short backchannel (<=3 words)": "okay .",
+      "patient addresses the doctor ('you')": "yeah , it's good seeing you too dr. hughes . you look like you're doing well ."
+    }
+  }
+}

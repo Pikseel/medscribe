@@ -1,0 +1,270 @@
+encounter,gold,pred,words,category,text
+D2N088,Doctor,Patient,8,doctor speaks in first person (no 'you'),"i'm doing well , i'm doing well ."
+D2N088,Doctor,Patient,18,doctor speaks in first person (no 'you'),"i'd like to see that a little bit better , around six or seven , if possible ."
+D2N088,Patient,Doctor,21,other / content overlap,"u- u- um , maybe not necessarily . maybe in a , uh , few months we'll check on that ."
+D2N089,Patient,Doctor,8,patient asks a question,i'm doing well . how are you ?
+D2N089,Doctor,Patient,12,other / content overlap,okay . all right . it was good to see you .
+D2N090,Doctor,Patient,13,other / content overlap,okay . 'cause we do n't wan na end up in the hospitaltoo
+D2N090,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N090,Doctor,Patient,4,other / content overlap,lightheadedness ? dizziness ?
+D2N091,Doctor,Patient,5,other / content overlap,no broken bones recently ?
+D2N091,Doctor,Patient,6,other / content overlap,"no , nothing like that ?"
+D2N091,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N092,Patient,Doctor,6,other / content overlap,"hey , dr . gomez ."
+D2N092,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N092,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N092,Doctor,Patient,7,other / content overlap,"okay . that's pretty tender , ?"
+D2N092,Doctor,Patient,10,doctor speaks in first person (no 'you'),but mostly when i do that type of motion ?
+D2N093,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N094,Patient,Doctor,12,patient asks a question,"nice to meet you , dr. cooper . how are you ?"
+D2N094,Doctor,Patient,2,short backchannel (<=3 words),really ?
+D2N095,Patient,Doctor,8,patient asks a question,i'm doing well . how are you ?
+D2N095,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N096,Doctor,Patient,3,short backchannel (<=3 words),a week .
+D2N096,Doctor,Patient,2,short backchannel (<=3 words),yeah .
+D2N096,Doctor,Patient,4,other / content overlap,"yeah , okay ."
+D2N096,Doctor,Patient,3,short backchannel (<=3 words),"okay , uh-"
+D2N096,Doctor,Patient,4,other / content overlap,"yeah , okay ."
+D2N096,Patient,Doctor,2,short backchannel (<=3 words),uh- .
+D2N096,Doctor,Patient,5,other / content overlap,. a little bit .
+D2N096,Doctor,Patient,4,other / content overlap,for a week .
+D2N096,Doctor,Patient,2,short backchannel (<=3 words),mm-hmm .
+D2N096,Patient,Doctor,14,patient asks a question,". so , um , i hope that should n't matter , right ?"
+D2N096,Doctor,Patient,13,other / content overlap,"so ... but i would try to rest my , your left arm-"
+D2N096,Doctor,Patient,5,other / content overlap,. while it's healing .
+D2N096,Patient,Doctor,10,patient asks a question,"can i , uh , carry any heavy weights or-"
+D2N096,Doctor,Patient,7,other / content overlap,"no , no . definitely not ."
+D2N096,Patient,Doctor,5,patient asks a question,. anything like that ?
+D2N096,Doctor,Patient,3,short backchannel (<=3 words),definitely not .
+D2N096,Patient,Doctor,4,other / content overlap,okay . okay .
+D2N096,Doctor,Patient,8,other / content overlap,"yeah , use , um , right hand-"
+D2N096,Doctor,Patient,2,short backchannel (<=3 words),. instead-
+D2N096,Doctor,Patient,15,other / content overlap,". for the next , uh , at least just three to four weeks ."
+D2N096,Doctor,Patient,9,other / content overlap,. after just resting and regular pain reliever .
+D2N096,Patient,Doctor,5,other / content overlap,okay . all right .
+D2N096,Patient,Doctor,17,patient asks a question,"should we take another x-ray when i come back , if the pain does n't improve ?"
+D2N096,Patient,Doctor,2,short backchannel (<=3 words),uh .
+D2N096,Doctor,Patient,2,short backchannel (<=3 words),yeah .
+D2N096,Doctor,Patient,2,short backchannel (<=3 words),yeah .
+D2N096,Patient,Doctor,25,patient asks a question,"yeah , and if i have more pain , can i call you ? can i fix up another appointment earlier than three weeks ?"
+D2N096,Doctor,Patient,6,other / content overlap,"yeah , so , um ..."
+D2N096,Doctor,Patient,9,doctor speaks in first person (no 'you'),"ale- , aleve . i mean , aleve ."
+D2N096,Doctor,Patient,3,short backchannel (<=3 words),thank you .
+D2N097,Patient,Doctor,8,patient asks a question,i'm doing okay . how are you ?
+D2N097,Patient,Doctor,3,short backchannel (<=3 words),all right .
+D2N098,Doctor,Patient,20,other / content overlap,mm . that does not sound like fun . it sounds like you injured it going up the stairs ?
+D2N098,Patient,Doctor,7,patient asks a question,so what are the possible treatments ?
+D2N098,Patient,Doctor,11,patient asks a question,will do . thank you . i appreciate your help .
+D2N099,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N099,Doctor,Patient,28,other / content overlap,"okay . so , a little bit of a low-grade fever there , definitely . and , how was his appetite ? did he eat last night ?"
+D2N099,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N099,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N099,Doctor,Patient,8,other / content overlap,irritable because he is n't feeling good ?
+D2N099,Doctor,Patient,3,short backchannel (<=3 words),thank you .
+D2N099,Doctor,Patient,9,other / content overlap,"good , good . that's a good choice ."
+D2N099,Doctor,Patient,5,other / content overlap,okay . that's good .
+D2N099,Doctor,Patient,6,other / content overlap,is it a dandruff shampoo ?
+D2N099,Doctor,Patient,16,other / content overlap,do n't forget to breathe little one . okay . let's try the front too .
+D2N099,Doctor,Patient,14,other / content overlap,excellent . he's doing excellent . next let's- let's check out those ears .
+D2N099,Doctor,Patient,25,other / content overlap,"but , if he does n't become barky , you do n't have to use it . it only works for the barky cough ."
+D2N099,Doctor,Patient,35,doctor speaks in first person (no 'you'),"now , whether that would really hurt a baby , i am unsure , but it has real honey in it . so , no honey for him , but agave is definitely fine ."
+D2N099,Doctor,Patient,4,other / content overlap,"yes , zarbee's ."
+D2N099,Doctor,Patient,24,other / content overlap,"yes . and so , if he ends up starting the medicine , just give him a half a teaspoon for five days ."
+D2N099,Doctor,Patient,140,other / content overlap,"what i would do is use something like either head & shoulder's , or selsun blue , or nizoral ad . now , do n't get the extra strength stuff , just use the regular strength . um , cradle cap , it's just basically a fancy way of saying dandruff . so , those shampoos will help get rid of it . it's not an immediate thing 'cause they , um , they are all dead scales , and you still have to brush them off . so , continue to use the soft brush and some baby oil , or something that will help get the scales out , and those shampoos will actually help to prevent it as well . use it two times per week , not every day , but maybe twice a week ."
+D2N100,Doctor,Patient,7,other / content overlap,do those seem to be helping ?
+D2N100,Patient,Doctor,14,patient asks a question,"do you wan na know , like , the things i currently use ?"
+D2N100,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N100,Patient,Doctor,13,patient asks a question,"okay , so is there anything we can do to help it ?"
+D2N101,Patient,Doctor,11,patient asks a question,"nice to meet you , ma'am . how are you ?"
+D2N101,Doctor,Patient,24,doctor speaks in first person (no 'you'),"well , i perform a lot of breast reduction surgeries , pretty much every week , so it is a very common procedure ."
+D2N101,Patient,Doctor,19,other / content overlap,"uh , i drink a little wine on occasion , and for school , i'm currently studying psychology ."
+D2N101,Patient,Doctor,2,short backchannel (<=3 words),right .
+D2N101,Patient,Doctor,18,other / content overlap,"okay . well , i will notify the office as soon as i have the insurance information ."
+D2N102,Patient,Doctor,11,patient asks a question,okay . is there any food i should n't eat ?
+D2N102,Patient,Doctor,3,short backchannel (<=3 words),what's oxalate ?
+D2N102,Patient,Doctor,23,patient addresses the doctor ('you'),"all right . well , let's hope we do n't have to do either of those and i see you next year ."
+D2N103,Doctor,Patient,10,other / content overlap,"ms. sanchez , it's good to see you again ."
+D2N103,Patient,Doctor,17,patient addresses the doctor ('you'),"yeah , it's good seeing you too dr. hughes . you look like you're doing well ."
+D2N103,Doctor,Patient,44,other / content overlap,"yeah , it does sounds kind of weird , right ? it's when your heart does n't beat with the correct rhythm , and whatever rhythm it does n't have a pattern to it . so , it's part of the atrial fibrillation ."
+D2N103,Doctor,Patient,25,other / content overlap,"yeah , it's not ideal . but , many people have a-fib are able to keep it under control with medicine and lifestyle changes ."
+D2N104,Patient,Doctor,11,patient asks a question,"i'm doing good , thank you . how are you ?"
+D2N104,Doctor,Patient,13,other / content overlap,"okay . that's probably from the prednisone , it can increase bruising ."
+D2N104,Patient,Doctor,3,short backchannel (<=3 words),all right .
+D2N104,Doctor,Patient,10,other / content overlap,it was great seeing you too . thank you .
+D2N105,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N105,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N105,Doctor,Patient,6,other / content overlap,got it . all right .
+D2N105,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N105,Doctor,Patient,2,short backchannel (<=3 words),okay .
+D2N105,Doctor,Patient,4,other / content overlap,mm-hmm . okay .
+D2N105,Patient,Doctor,13,other / content overlap,"um , but that's been going down gradually for about a year ."
+D2N105,Doctor,Patient,7,doctor speaks in first person (no 'you'),"okay , i'll make that adjustment ."
+D2N105,Doctor,Patient,5,doctor speaks in first person (no 'you'),"okay , i see ."
+D2N105,Patient,Doctor,26,patient addresses the doctor ('you'),"i see . okay . well , i guess we'll see , um , what you see from , from the , um , test ."
+D2N106,Doctor,Patient,20,other / content overlap,hey charles i'm using this cool new recording device to help me with my documentation is that okay with you
+D2N106,Patient,Doctor,13,patient addresses the doctor ('you'),well i could be better you know i moved out in the city
+D2N106,Doctor,Patient,10,other / content overlap,about two years ago bought this big plot of land
+D2N106,Patient,Doctor,1,short backchannel (<=3 words),oh
+D2N106,Doctor,Patient,8,doctor speaks in first person (no 'you'),i love it lots of deer round awesome
+D2N106,Patient,Doctor,3,short backchannel (<=3 words),you be hunter
+D2N106,Doctor,Patient,6,doctor speaks in first person (no 'you'),huge hunter i love hunter yeah
+D2N106,Doctor,Patient,7,other / content overlap,is n't what it used to be
+D2N106,Doctor,Patient,26,other / content overlap,yeah it's you know i i seem to catch my breath a lot more than i used to and i consider myself to be pretty healthy
+D2N106,Patient,Doctor,4,patient addresses the doctor ('you'),you look pretty healthy
+D2N106,Doctor,Patient,11,doctor speaks in first person (no 'you'),eyes they're water does n't make very much sense to me
+D2N106,Doctor,Patient,5,doctor speaks in first person (no 'you'),i always think it's allergies
+D2N106,Doctor,Patient,3,short backchannel (<=3 words),mostly could be
+D2N106,Doctor,Patient,5,doctor speaks in first person (no 'you'),yeah i get eyebugers too
+D2N106,Patient,Doctor,1,short backchannel (<=3 words),uh
+D2N106,Doctor,Patient,21,doctor speaks in first person (no 'you'),crazy uh the last time it happened i went to the urgent care and they gave me a nebulizer that helped
+D2N106,Doctor,Patient,1,short backchannel (<=3 words),hmmm
+D2N106,Doctor,Patient,8,doctor speaks in first person (no 'you'),hmmm yeah i'm not a big cat person
+D2N106,Doctor,Patient,8,other / content overlap,no no travels and no symptoms right now
+D2N106,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N106,Doctor,Patient,1,short backchannel (<=3 words),yes
+D2N107,Patient,Doctor,10,other / content overlap,i i i normally do n't do any physical activity
+D2N107,Patient,Doctor,16,patient addresses the doctor ('you'),i do n't want to take this away you better go back to talking to him
+D2N107,Patient,Doctor,4,patient asks a question,can you repeat that
+D2N108,Doctor,Patient,4,other / content overlap,do n't recall alright
+D2N108,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N109,Doctor,Patient,8,other / content overlap,okay has that helped much or not really
+D2N109,Doctor,Patient,14,doctor speaks in first person (no 'you'),okay got it and no bleeding or i'm sure it's a little swollen probably
+D2N109,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N109,Doctor,Patient,1,short backchannel (<=3 words),good
+D2N109,Patient,Doctor,1,short backchannel (<=3 words),so
+D2N109,Patient,Doctor,13,other / content overlap,i am due for one of those in the next couple of weeks
+D2N109,Patient,Doctor,12,other / content overlap,that's a great plan i need to get back to exercising so
+D2N109,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N109,Doctor,Patient,10,other / content overlap,sounds good sounds good good great seeing you thanks stephanie
+D2N110,Doctor,Patient,8,doctor speaks in first person (no 'you'),i'm so upset too i love those shoes
+D2N110,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N111,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N111,Patient,Doctor,42,patient addresses the doctor ('you'),ra i'm not suspicious but we're just gon na go with that okay because looking at your vitals it it is of still a bit high i'm not really comfortable i see like a hundred and eighty over you know eighty and
+D2N112,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N112,Patient,Doctor,63,patient addresses the doctor ('you'),you know standing walking seems to make it worse coughing sneezing makes it worse and you know i had a friend that saw you and you know you burned some nerves or something like that and so i was just seeing if there was something that you could do to get me out of this pain and hopefully you can do it today
+D2N112,Patient,Doctor,195,patient addresses the doctor ('you'),you know it it's my back that's weak and my legs are weak both of them you know coughing sneezing seem to make it worse so sorry i'm just trying to be like a typical patient because most patients they do n't answer the darn questions so you you know all this time i still have n't gotten a chief complaint out of them so i love the way that you're trying to redirect and so you know what your doctor said you had back pain and leg pain but for me the most important thing for me to capture is that it's in the hip side of the leg side of the calf goes to the big toe and so i need them to be able to give me a perfect sort of root signature so i can hone in is that four five disk seen on the mri really significant or is it on the opposite side but again i'm sorry i'm purposely trying to be in a difficult patient because some of these patients he asked them fifty different questions they wo n't answer any of them so anyway sorry about well
+D2N112,Doctor,Patient,2,short backchannel (<=3 words),that's okay
+D2N112,Doctor,Patient,1,short backchannel (<=3 words),absolutely
+D2N113,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N113,Doctor,Patient,15,other / content overlap,okay and and has work been not hard lately you've been busy it sounds like
+D2N113,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N113,Doctor,Patient,8,doctor speaks in first person (no 'you'),okay well i hope kids are doing okay
+D2N113,Patient,Doctor,7,other / content overlap,yeah all of all of the above
+D2N113,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N113,Patient,Doctor,5,other / content overlap,hypertension diabetes and also depression
+D2N113,Patient,Doctor,18,other / content overlap,okay alright so i'll make sure i'll have them set up an appointment with our our family doctor
+D2N113,Patient,Doctor,2,short backchannel (<=3 words),okay bye
+D2N113,Doctor,Patient,1,short backchannel (<=3 words),bye
+D2N114,Patient,Doctor,8,patient addresses the doctor ('you'),good morning Julie how are you doing today
+D2N114,Doctor,Patient,16,doctor speaks in first person (no 'you'),i'm doing okay i'm just a little nervous about what's been going on with my headaches
+D2N114,Patient,Doctor,22,patient addresses the doctor ('you'),okay so i know you were sent here by your your pcp what was your understanding of why you were sent here
+D2N114,Doctor,Patient,90,doctor speaks in first person (no 'you'),yeah so i actually have been someone who been struggling with headaches for years now ever since i was a teenager and they used to be around my when i would have my menstrual my menses but as i got older i noticed that it has been with that and also i can get it when i'm really stressed but recently and why i went to her is because my headaches have been getting a lot more they've just been happening a lot more frequently and a lot more severe
+D2N114,Patient,Doctor,22,patient addresses the doctor ('you'),okay can you tell me a little bit about them what how do they how do they feel when they come on
+D2N114,Doctor,Patient,30,doctor speaks in first person (no 'you'),so they say mostly on my right side and it even seems like it's like behind my eye and it just like this pulsing like this really bad pulsing sensation
+D2N114,Patient,Doctor,43,patient addresses the doctor ('you'),okay do you notice these any activities or time of the day that makes them worse i know you said they they seem to get worse around your menstrual periods but is there any time of the day or that makes them worse
+D2N114,Doctor,Patient,57,other / content overlap,i i have noticed that you know i've been trying to exercise more in order to lose weight but i ca n't even really exercise for very long because i start of as soon as i start to jog i my headaches the headaches come back on a lot worse so i notice it when i'm exercising
+D2N114,Patient,Doctor,62,patient addresses the doctor ('you'),okay and do you seem to have any other symptoms when you get these headaches i've been having a ringing in my ears for a few months now and then what really scared me is that now i'm starting to get some blurred vision it's not all the time but it it will come and go but some blurred like on the
+D2N114,Doctor,Patient,8,doctor speaks in first person (no 'you'),in my on the side of my vision
+D2N114,Patient,Doctor,18,patient addresses the doctor ('you'),okay okay and have you experienced any numbness or tingling to your hands or feet or your face
+D2N114,Doctor,Patient,4,doctor speaks in first person (no 'you'),no i have n't
+D2N114,Patient,Doctor,33,patient addresses the doctor ('you'),okay so you you like to run a lot what kind of do you do you use a a good shoe you know what kind of shoes do you use for your running
+D2N114,Doctor,Patient,37,doctor speaks in first person (no 'you'),yeah i yeah i i'm starting to get back into it i'm a big new balance person in asics so yeah those are the two brands i like to wear yeah so right now i'm using asics
+D2N114,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N114,Doctor,Patient,1,short backchannel (<=3 words),hmmm
+D2N114,Patient,Doctor,11,patient addresses the doctor ('you'),that's good you know it is running is a great exercise
+D2N114,Doctor,Patient,2,short backchannel (<=3 words),it is
+D2N114,Patient,Doctor,42,patient addresses the doctor ('you'),so have you had any let's get back to the exam here have you had a recent mri of your brain i saw one from a few years ago but as doctor white said anything about getting a more a recent mri
+D2N114,Doctor,Patient,28,other / content overlap,yeah she was gon na put one in but she wanted me to see you first and urgently so they have n't called me yet for the mri
+D2N114,Patient,Doctor,66,patient addresses the doctor ('you'),okay so that's good we i think we'll we will follow up with that mri but let's go ahead and take a do a quick physical exam here i reviewed your vitals that the the assistant collected when you came in and everything there looks good including your blood pressure you know with symptoms like that that's one of those things that i'd be concerned about
+D2N114,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N114,Patient,Doctor,106,patient addresses the doctor ('you'),now on your heart exam it sounds like it's normal sinus rhythm with no murmurs rubs or gallops so that's good as i listen i'm gon na go ahead and look here in your eyes the funduscopic exam shows papilledema and that's just some of swelling behind there in the eye and this let me do a a neurological exam this will take a few minutes you get up to follow my instructions as we go through that okay on neurological exam your cranial nerves one through twelve are intact including a normal cranial reflex and just went to watch you walk across the room here
+D2N114,Patient,Doctor,262,patient addresses the doctor ('you'),that's okay for your first problem your headaches your symptoms are concerning for what we call idiopathic intracranial hypertension and this is a condition that that you have increased pressure in the in your head in your brain without any known cause for it now patient also presents with often present with symptoms such as yours you know headaches worsening with activity ringing in the ears changes in your vision so i'm i'm pretty confident that that's what we're having here now why we get concerned is if the pressure continues to increase this can lead to some permanent changes in your vision so i i do wan na get a a few more tests just so we can confirm that diagnosis and the first one that we just talked about is an mri i think it's really important to get that to check for any other condition that could be contributing to your symptoms now once i have that result i'm gon na be doing also doing a spinal tap which will help me evaluate the pressure in the brain and it can also help you feel better if you do have an increased pressure by taking the decreasing the amount of that pressure just by taking a a a little bit of fluid off of that and lastly i want you to be seen by a neuro-ophthalmologist for a complete eye exam now i i know that sounds like a lot of information but i think it's really important we get that accomplished do you have any questions for me
+D2N114,Patient,Doctor,50,patient addresses the doctor ('you'),not necessarily if you have idiopathic intracranial hypertension there are number of medications that we can try to help decrease that pressure in your brain and this will also help you have less headaches when you exercise as exercise and weight loss are also an important part of the treatment
+D2N114,Patient,Doctor,59,patient addresses the doctor ('you'),yeah that's a great question here i i'm gon na go ahead and we're gon na for the mri i'll have to get a preapproval from your insurance company i will work on that my my my team in the front office will get that preapproved and then once that's done we'll call you to help schedule that mri
+D2N115,Doctor,Patient,1,short backchannel (<=3 words),mm-hmm
+D2N115,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N115,Doctor,Patient,6,other / content overlap,okay has anything made it better
+D2N115,Doctor,Patient,1,short backchannel (<=3 words),mm-hmm
+D2N115,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N115,Patient,Doctor,29,other / content overlap,no i mean i i know that going to the emergency room that like the english rides like five hundred bucks so i did n't want to do that
+D2N116,Doctor,Patient,1,short backchannel (<=3 words),mm-hmm
+D2N116,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N116,Doctor,Patient,2,short backchannel (<=3 words),okay thanks
+D2N117,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N117,Doctor,Patient,1,short backchannel (<=3 words),now
+D2N117,Patient,Doctor,14,patient addresses the doctor ('you'),kind of a tennis guy too right did you see the the australia open
+D2N117,Doctor,Patient,21,doctor speaks in first person (no 'you'),i did i did yeah that was that was crazy that was a great tournament what a what a finish unbelievable
+D2N117,Patient,Doctor,12,patient addresses the doctor ('you'),yeah hey did you see the masters i know you're a golfer
+D2N117,Doctor,Patient,41,other / content overlap,yeah yeah yeah i do n't get out as often as i as as i like to but but the masters yeah that was that was amazing that was lot of fun to lot of fun did you catch it too
+D2N117,Doctor,Patient,1,short backchannel (<=3 words),yeah
+D2N117,Doctor,Patient,1,short backchannel (<=3 words),yeah
+D2N117,Patient,Doctor,27,patient addresses the doctor ('you'),they are like one fifty one sixty you know we just had easter and my kids got a whole bunch of candies so i keep eating that
+D2N117,Doctor,Patient,3,short backchannel (<=3 words),yeah yeah well
+D2N118,Doctor,Patient,11,other / content overlap,this one passed how long would you say it took to
+D2N118,Doctor,Patient,1,short backchannel (<=3 words),yeah
+D2N118,Patient,Doctor,3,short backchannel (<=3 words),the pain's gone
+D2N118,Doctor,Patient,7,other / content overlap,okay do you remember what it was
+D2N118,Doctor,Patient,71,other / content overlap,okay maybe you have a little white coat syndrome some of my patients do have it i have it myself and i'm a provider so i definitely understand yeah i know we we talked about last time you getting a blood pressure cuff and taking those about two to three times a week so what have those readings been i'm usually like one thirty to one forty over sixty to seventy
+D2N118,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N118,Doctor,Patient,4,other / content overlap,yeah yeah definitely understand
+D2N118,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N118,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N118,Patient,Doctor,13,patient addresses the doctor ('you'),that sounds like a plan when should i come back and see you
+D2N119,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N119,Patient,Doctor,20,other / content overlap,and then sometimes they make me take less and less and less so the over like nine or ten days
+D2N119,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N119,Patient,Doctor,3,short backchannel (<=3 words),alright thank you
+D2N119,Patient,Doctor,2,short backchannel (<=3 words),alright thanks
+D2N120,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N120,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N120,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N120,Doctor,Patient,29,other / content overlap,yeah i'm sorry yep probably now at the peak of you know just learning it and being able to do more with it this comes and this happens right
+D2N120,Patient,Doctor,2,short backchannel (<=3 words),okay okay
+D2N120,Doctor,Patient,24,other / content overlap,alright and it's not a long procedure it's it's relatively quick and common and you should be out of the office within an hour
+D2N120,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N120,Patient,Doctor,3,short backchannel (<=3 words),alright thank you
+D2N122,Patient,Doctor,26,other / content overlap,i love that that road i just i i do n't like riding on the road so i prefer to do those rails the trails type
+D2N122,Doctor,Patient,1,short backchannel (<=3 words),yeah
+D2N122,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N122,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N123,Doctor,Patient,36,doctor speaks in first person (no 'you'),okay yeah i mean i think we all like to lose a little bit of weight but yeah it's a it says it's a struggle so no no chest pain or shortness of breath with this
+D2N123,Patient,Doctor,17,patient addresses the doctor ('you'),they're looking you know okay they are all within you know the range that we are targeting
+D2N124,Patient,Doctor,138,patient addresses the doctor ('you'),hey doctor michael yeah so my son sean i think you met in the past he he started playing basketball and there we do multiple seasons and so we're kinda getting ready for the next season that starts in in april and we were at the courts plan and i went up for a shot and he's far more aggressive than with me than he is with you know his peers i guess he could say and so he he found me while i was going for a lap and then when i came down i kind of landed awkwardly and i kind of like rolled and twisted my my ankle so now it's it's hurting a bit like kind of on the outside you can you can even see it's it's bruised up and a bit swollen
+D2N124,Doctor,Patient,1,short backchannel (<=3 words),yeah
+D2N124,Doctor,Patient,1,short backchannel (<=3 words),okay
+D2N124,Doctor,Patient,8,other / content overlap,sure so it does n't quite feel stable
+D2N124,Doctor,Patient,1,short backchannel (<=3 words),great
+D2N124,Patient,Doctor,4,other / content overlap,starting in april so
+D2N124,Patient,Doctor,2,short backchannel (<=3 words),how long
+D2N124,Patient,Doctor,50,other / content overlap,yeah i i work from home so that that should n't be a problem it's just everything else i do n't know who is gon na walk my dogs and and do all this stuff that's rest of my family refuses to walk my dog so we'll figure it out
+D2N125,Patient,Doctor,15,other / content overlap,miss edwards is here for evaluation of facial pain this is a 54 -year-old male
+D2N125,Doctor,Patient,69,other / content overlap,tell me what's been going on yeah so i've got this stabbing shooting pain i've had for a while you know and it it especially right here in my right face right in that cheek bone area it's sometimes it gets super hot i've had it for i think a couple of months now and i went to my family doctor and they said i should come see you
+D2N125,Patient,Doctor,14,patient addresses the doctor ('you'),okay great i would like to ask you a little bit more about that
+D2N125,Patient,Doctor,18,patient addresses the doctor ('you'),mm-hmm do you have any sensory loss meaning like numbness or tingling in that part of your face
+D2N125,Doctor,Patient,19,other / content overlap,sometimes certain kind of sensory outside of the wind sometimes that seems to trigger it but that's about it
+D2N125,Patient,Doctor,16,patient addresses the doctor ('you'),okay and anything that you've done to to that helps for a little bit when you
+D2N125,Doctor,Patient,24,other / content overlap,but that's you know so i i went to my family doctor and he said you know i really need to see a neurosurgeon
+D2N125,Doctor,Patient,22,other / content overlap,you know it can last for anywhere from a few minutes to sometimes about an hour but generally generally a few minutes
+D2N125,Patient,Doctor,14,patient addresses the doctor ('you'),any history of something like multiple sclerosis or any brain tumors that you know
+D2N125,Patient,Doctor,12,patient asks a question,how severe is the pain on a scale of one to ten
+D2N125,Doctor,Patient,56,other / content overlap,when it comes on it's like a ten it's like somebody is stabbing you with an ice pick and but usually you know after a few minutes usually it goes away but sometimes it can last up to an hour great so mister i would like to do a physical exam if that's okay with you
+D2N125,Patient,Doctor,19,patient addresses the doctor ('you'),that looks nice and symmetric i'm gon na rub my fingers next to your ear can you hear that
+D2N125,Doctor,Patient,1,short backchannel (<=3 words),yep
+D2N125,Patient,Doctor,10,patient addresses the doctor ('you'),you can hear it on the other side as well
+D2N125,Doctor,Patient,1,short backchannel (<=3 words),yep
+D2N125,Patient,Doctor,31,patient addresses the doctor ('you'),skin reaction to this medication and particularly people who have eustachian descent so that we may do some genetic testing just to make sure that it will be safe for you
+D2N125,Doctor,Patient,6,other / content overlap,okay sounds good let's do it
+D2N125,Patient,Doctor,32,patient addresses the doctor ('you'),okay so i will prescribe that for you and then we will see how that goes and if your pain continues we can talk about different surgical options to treat the pain
+D2N125,Patient,Doctor,5,patient addresses the doctor ('you'),great i'll see you then
+D2N126,Doctor,Patient,3,short backchannel (<=3 words),nice that's great
+D2N126,Patient,Doctor,6,patient addresses the doctor ('you'),i think you've explained it well
+D2N127,Doctor,Patient,5,other / content overlap,wow okay when was that
+D2N127,Doctor,Patient,3,short backchannel (<=3 words),all of them
+D2N127,Doctor,Patient,8,other / content overlap,okay the most recent crash when was that
+D2N127,Patient,Doctor,6,patient addresses the doctor ('you'),you're not judging me are you
+D2N127,Doctor,Patient,1,short backchannel (<=3 words),where
+D2N127,Doctor,Patient,2,short backchannel (<=3 words),okay where
+D2N127,Patient,Doctor,13,patient addresses the doctor ('you'),i saw pamela and doctor collins's office she's much nicer than you know
+D2N127,Patient,Doctor,7,patient addresses the doctor ('you'),thinking are are you saying i'm thinking
+D2N127,Doctor,Patient,8,doctor speaks in first person (no 'you'),no not by any means i am saying
+D2N127,Patient,Doctor,7,other / content overlap,pain i have a lot of pain

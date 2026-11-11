@@ -11,3 +11,4 @@ __pycache__/
 *.mp3
 *.m4a
 models/
+eval/data/

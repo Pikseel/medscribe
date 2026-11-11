@@ -1,39 +1,58 @@
-"""MedScribe interim presentation (12 Nov) — full merged deck.
+"""MedScribe mid-project deck, built to the CSE 484 rubric (Nov 2026).
 
-Uses the style helpers and slides 7-8 from notes/build_slides.py (Person 3), so the
-whole deck looks the same. Slides 5 and 6 are drafts from asr/ and roles/ results;
-their owners should check the numbers and speaker notes.
+Part 1: 10 talk slides in the rubric's order.  Part 2: Project Card, 4 appendix slides.
+Every number is read from results/ files at build time:
+    results/kisi4_role_eval.json   (python -m eval.role_eval)
+    results/kisi2_role_metrics.json, results/kisi1_eval_small.csv, notes/outputs/*.json
+Reuses Person 2's method slide and Person 3's note slide unchanged.
 
-    python -m app.build_deck      ->  results/medscribe_interim.pptx
+    python -m app.build_deck   ->  results/medscribe_midproject.pptx
 """
+import csv
 import json
 import os
+import statistics as st
 
 from pptx import Presentation
-from pptx.util import Inches
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.util import Inches, Pt
 
 from notes.build_slides import (INK, TEAL, TEAL2, MINT, MUTED, BG, WHITE, SOFT,
                                 TITLE_FONT, BODY_FONT, rect, textbox, para,
-                                slide_notes_generation, slide_experiment)
+                                slide_notes_generation)
+from roles.build_slides import slide_method
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MONO = "Courier New"
+TEAM = os.environ.get("TEAM", "Team ##")
+REPO = "github.com/Pikseel/medscribe"
 
 
+def R(*p):
+    return os.path.join(ROOT, *p)
+
+
+def pct(x, d=1):
+    return f"{x * 100:.{d}f}%"
+
+
+# ------------------------------------------------------------------ helpers
 def base(prs, kicker, title):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     rect(s, 0, 0, 13.333, 7.5, fill=BG)
     rect(s, 0, 0, 0.13, 7.5, fill=TEAL)
-    tb = textbox(s, 0.55, 0.42, 9.0, 0.3)
+    tb = textbox(s, 0.55, 0.40, 9.5, 0.3)
     para(tb.text_frame, True, [(kicker, BODY_FONT, 11, True, TEAL)])
-    tb = textbox(s, 0.55, 0.72, 12.0, 0.8)
-    para(tb.text_frame, True, [(title, TITLE_FONT, 32, True, INK)])
+    if title:
+        tb = textbox(s, 0.55, 0.70, 12.2, 0.75)
+        para(tb.text_frame, True, [(title, TITLE_FONT, 30, True, INK)], line_spacing=0.95)
     return s
 
 
-def card(s, x, y, w, h, accent=None):
-    rect(s, x, y, w, h, fill=WHITE, line=SOFT, radius=0.05, line_w=1.25)
+def card(s, x, y, w, h, accent=None, fill=WHITE):
+    rect(s, x, y, w, h, fill=fill, line=SOFT, radius=0.04, line_w=1.25)
     if accent is not None:
         rect(s, x, y, 0.05, h, fill=accent)
 
@@ -44,338 +63,495 @@ def label(s, x, y, w, text, color=TEAL2):
 
 
 def lines(s, x, y, w, h, items, size=12, color=INK, gap=5, font=BODY_FONT):
-    """items: str or list of (text, bold) runs."""
     tf = textbox(s, x, y, w, h).text_frame
     for i, it in enumerate(items):
         runs = [(it, False)] if isinstance(it, str) else it
-        para(tf, i == 0, [(t, font, size, b, color) for t, b in runs],
-             space_after=gap, line_spacing=1.1)
+        para(tf, i == 0, [(t, font, size, b, color) for t, b in runs], space_after=gap, line_spacing=1.08)
     return tf
 
 
-def chip(s, x, y, text, fill=TEAL, w=0.36):
-    c = rect(s, x, y, w, 0.36, fill=fill, radius=0.5)
-    tf = c.text_frame
-    tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
-    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    para(tf, True, [(text, BODY_FONT, 9.5, True, WHITE)], align=PP_ALIGN.CENTER)
-
-
-def stat(s, x, y, num, text, w=2.9):
+def stat(s, x, y, num, text, w=2.9, size=30):
     tb = textbox(s, x, y, w, 1.0)
-    para(tb.text_frame, True, [(num, TITLE_FONT, 34, True, TEAL)])
-    para(tb.text_frame, False, [(text, BODY_FONT, 11, False, MUTED)], line_spacing=1.05)
+    para(tb.text_frame, True, [(num, TITLE_FONT, size, True, TEAL)])
+    para(tb.text_frame, False, [(text, BODY_FONT, 10.5, False, MUTED)], line_spacing=1.05)
+
+
+def table(s, x, y, col_w, rows, row_h=0.42, size=11, head_fill=INK, bold_rows=()):
+    """rows[0] is the header. col_w: list of widths (in)."""
+    for r, row in enumerate(rows):
+        cx = x
+        for c, v in enumerate(row):
+            if r == 0:
+                rect(s, cx, y, col_w[c], row_h, fill=head_fill)
+                col, b = WHITE, True
+            else:
+                rect(s, cx, y, col_w[c], row_h, fill=WHITE if r % 2 else SOFT, line=SOFT, line_w=0.75)
+                col, b = INK, (r in bold_rows)
+            tb = textbox(s, cx, y, col_w[c], row_h, anchor=MSO_ANCHOR.MIDDLE)
+            para(tb.text_frame, True, [(str(v), BODY_FONT, size, b, col)],
+                 align=PP_ALIGN.LEFT if c == 0 else PP_ALIGN.CENTER)
+            cx += col_w[c]
+        y += row_h
+    return y
 
 
 def notes(s, text):
     s.notes_slide.notes_text_frame.text = text
 
 
-# ------------------------------------------------------------------ slides
-def s1_title(prs):
+def ci(v):
+    return f"{pct(v['accuracy'])}  [{v['ci95'][0] * 100:.1f}–{v['ci95'][1] * 100:.1f}]"
+
+
+# ------------------------------------------------------------------ data
+def load_all():
+    ev = json.load(open(R("results", "kisi4_role_eval.json")))
+    cv = json.load(open(R("results", "kisi2_role_metrics.json")))["group_5fold"]
+    asr = list(csv.DictReader(open(R("results", "kisi1_eval_small.csv"))))
+    from rouge_score import rouge_scorer
+    sc = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+    rouge = {}
+    for cond in ("rollu", "rolsuz"):
+        rouge[cond] = []
+        for i in (1, 2, 3):
+            ref = json.load(open(R("notes", "data", f"aci_00{i}.json")))["reference_note"]
+            n = json.load(open(R("notes", "outputs", f"aci_00{i}_{cond}.json")))
+            sco = sc.score(ref, "\n".join(n[k] for k in "SOAP"))
+            rouge[cond].append({m: sco[m].fmeasure for m in ("rouge1", "rouge2", "rougeL")})
+    acc = [float(r["dogruluk"]) for r in asr]
+    asr_s = {"n": len(asr), "correct": sum(int(r["dogru_n"]) for r in asr),
+             "total": sum(int(r["cumle"]) for r in asr), "mean": st.mean(acc), "std": st.pstdev(acc),
+             "min": min(acc)}
+    return ev, cv, asr_s, rouge
+
+
+def rmean(rouge, cond, m):
+    return st.mean(x[m] for x in rouge[cond])
+
+
+# ------------------------------------------------------------------ talk slides
+def s1_rq(prs, rouge):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     rect(s, 0, 0, 13.333, 7.5, fill=INK)
-    tb = textbox(s, 0.9, 1.6, 11.5, 0.4)
-    para(tb.text_frame, True, [("NLP COURSE PROJECT  ·  INTERIM PRESENTATION", BODY_FONT, 13, True, MINT)])
-    tb = textbox(s, 0.9, 2.15, 11.5, 1.2)
-    para(tb.text_frame, True, [("MedScribe", TITLE_FONT, 60, True, WHITE)])
-    tb = textbox(s, 0.9, 3.4, 11.0, 1.0)
-    para(tb.text_frame, True, [("Speaker role detection and automatic SOAP notes from "
-                                "doctor–patient conversations", BODY_FONT, 20, False, SOFT)])
-    names = ["Mehmet Akif Çavuş", "Yusuf Eren Nalbant", "Alp Enes Şeker", "Ali Iskif"]
-    x = 0.9
-    for n in names:
-        rect(s, x, 5.35, 2.75, 0.5, fill=TEAL, radius=0.5)
-        tb = textbox(s, x, 5.35, 2.75, 0.5, anchor=MSO_ANCHOR.MIDDLE)
-        para(tb.text_frame, True, [(n, BODY_FONT, 12, True, WHITE)], align=PP_ALIGN.CENTER)
-        x += 2.95
-    tb = textbox(s, 0.9, 6.3, 8, 0.4)
-    para(tb.text_frame, True, [("12 November 2026", BODY_FONT, 12, False, MUTED)])
-    notes(s, "Slide 1 (~15 s, Akif): 'We are the MedScribe team. In ten minutes we show what "
-             "changed since the proposal, a working demo and our first results.'")
-
-
-def s2_problem(prs):
-    s = base(prs, "PROBLEM", "Doctors write notes instead of listening")
-    card(s, 0.55, 1.85, 5.9, 4.6)
-    label(s, 0.8, 2.0, 5.4, "THE BURDEN")
-    lines(s, 0.8, 2.4, 5.45, 3.9, [
-        "Every visit ends in a clinical note, usually typed into the record system during "
-        "or after the consultation.",
-        "Documentation time is a widely reported driver of physician burnout.",
-        "“Ambient scribes” listen to the visit and draft the note; we build a small, "
-        "open version of that pipeline.",
-    ], size=13, gap=10)
-    card(s, 6.85, 1.85, 5.9, 4.6, accent=MINT)
-    label(s, 7.1, 2.0, 5.4, "THE NLP GAP WE TARGET")
-    lines(s, 7.1, 2.4, 5.4, 1.4, [
-        "Diarization separates voices but only says who spoke, not which one is the doctor:",
-    ], size=13)
-    for i, (spk, role, col) in enumerate([("SPEAKER_00", "Doctor ?", TEAL), ("SPEAKER_01", "Patient ?", TEAL2)]):
-        y = 3.55 + i * 0.7
-        rect(s, 7.1, y, 2.2, 0.48, fill=SOFT, radius=0.3)
-        tb = textbox(s, 7.1, y, 2.2, 0.48, anchor=MSO_ANCHOR.MIDDLE)
-        para(tb.text_frame, True, [(spk, MONO, 12, True, INK)], align=PP_ALIGN.CENTER)
-        tb = textbox(s, 9.4, y, 0.6, 0.48, anchor=MSO_ANCHOR.MIDDLE)
-        para(tb.text_frame, True, [("→", BODY_FONT, 18, True, MUTED)], align=PP_ALIGN.CENTER)
-        rect(s, 10.1, y, 2.2, 0.48, fill=col, radius=0.3)
-        tb = textbox(s, 10.1, y, 2.2, 0.48, anchor=MSO_ANCHOR.MIDDLE)
-        para(tb.text_frame, True, [(role, BODY_FONT, 12, True, WHITE)], align=PP_ALIGN.CENTER)
-    lines(s, 7.1, 5.05, 5.4, 1.2, [
-        "We predict the role from what each speaker says, and measure whether the role "
-        "changes the note an LLM writes.",
-    ], size=13)
-    notes(s, "Slide 2 (~45 s, Akif): Doctors spend a large part of the visit documenting. "
-             "Ambient scribes try to automate the note. The NLP gap: diarization gives "
-             "SPEAKER_00 / SPEAKER_01 but not who the doctor is. That is what we solve from text.")
-
-
-def s3_scope(prs):
-    s = base(prs, "WHAT CHANGED AFTER YOUR FEEDBACK", "Narrower scope, one research question")
-    cols = [
-        (0.55, "KEPT", TEAL, [
-            "Speech → speaker-separated transcript (WhisperX)",
-            "Doctor / Patient role classifier (ours, trained)",
-            "SOAP note generation with an open LLM (prompting, no training)",
-            "With-roles vs without-roles experiment",
-            "Gradio web demo",
-        ]),
-        (4.75, "DROPPED", MUTED, [
-            "Clinical NER model and hand annotation",
-            "Flan-T5 fine-tuning",
-            "Building a Turkish dataset",
-            "Large human evaluation",
-            "Separate WER/DER study",
-        ]),
-    ]
-    for x, head, col, items in cols:
-        card(s, x, 1.85, 3.95, 4.15, accent=col)
-        label(s, x + 0.25, 2.0, 3.5, head, color=col)
-        lines(s, x + 0.25, 2.4, 3.55, 3.5, items, size=12.5, gap=9)
-    rect(s, 8.95, 1.85, 3.8, 4.15, fill=INK, radius=0.05)
-    label(s, 9.2, 2.0, 3.4, "RESEARCH QUESTION", color=MINT)
-    tb = textbox(s, 9.2, 2.45, 3.35, 3.4)
-    para(tb.text_frame, True, [("Does telling the LLM who is the doctor and who is the "
-                                "patient change the SOAP note it writes?", TITLE_FONT, 17, True, WHITE)],
+    tb = textbox(s, 0.7, 0.45, 12, 0.35)
+    para(tb.text_frame, True, [(f"CSE 484 MID-PROJECT  ·  {TEAM.upper()}  ·  MEDSCRIBE", BODY_FONT, 12, True, MINT)])
+    label(s, 0.7, 1.05, 6, "RESEARCH QUESTION", color=SOFT)
+    tb = textbox(s, 0.7, 1.4, 11.9, 1.4)
+    para(tb.text_frame, True, [("Do Doctor / Patient speaker labels make an LLM write a "
+                                "better SOAP note from a consultation transcript?", TITLE_FONT, 28, True, WHITE)],
+         line_spacing=1.05)
+    rect(s, 0.7, 3.05, 7.4, 2.55, fill=TEAL, radius=0.04)
+    tb = textbox(s, 0.95, 3.18, 7.0, 2.35)
+    para(tb.text_frame, True, [("FIRST ANSWER:  NO, NOT ON AVERAGE", BODY_FONT, 13, True, WHITE)])
+    para(tb.text_frame, False, [(f"ROUGE-L {rmean(rouge, 'rollu', 'rougeL'):.3f} with labels vs "
+                                 f"{rmean(rouge, 'rolsuz', 'rougeL'):.3f} without", TITLE_FONT, 18, True, WHITE)],
+         space_before=6)
+    para(tb.text_frame, False, [("3 dev dialogues, Qwen2.5-7B, same prompt. Labels fixed a negation "
+                                 "error but made the model echo the longest transcript: errors moved, "
+                                 "they did not disappear.", BODY_FONT, 12.5, False, SOFT)], space_before=8,
          line_spacing=1.1)
-    para(tb.text_frame, False, [("Same model, same prompt; only the speaker labels in the "
-                                 "transcript change.", BODY_FONT, 11.5, False, SOFT)], space_before=12)
-    lines(s, 0.55, 6.3, 12.2, 0.6, [[("NLP contribution: ", True),
-          ("two role classifiers compared + error analysis, and a controlled measurement of "
-           "what role labels do to the generated note.", False)]], size=12.5, color=INK)
-    notes(s, "Slide 3 (~60 s, Akif): You told us the proposal was too wide. We kept the "
-             "pipeline, dropped NER, fine-tuning, the Turkish dataset and the big human "
-             "evaluation. The research question is now one sentence: does role information "
-             "change the note? Prompt and model are fixed, only the labels change.")
+    rect(s, 8.4, 3.05, 4.25, 2.55, fill=WHITE, radius=0.04)
+    tb = textbox(s, 8.6, 3.18, 3.9, 2.35)
+    para(tb.text_frame, True, [("CHANGED SINCE THE PROPOSAL", BODY_FONT, 10.5, True, TEAL)])
+    para(tb.text_frame, False, [("Old: build a 5-stage scribe (ASR, roles, NER, note, demo), no single "
+                                 "question.", BODY_FONT, 11, False, INK)], space_before=5, line_spacing=1.08)
+    para(tb.text_frame, False, [("Why: feedback asked us to narrow it; NER, fine-tuning and the Turkish "
+                                 "set are dropped.", BODY_FONT, 11, False, INK)], space_before=5, line_spacing=1.08)
+    x = 0.7
+    for n in ["Mehmet Akif Çavuş", "Yusuf Eren Nalbant", "Alp Enes Şeker", "Ali Iskif"]:
+        rect(s, x, 6.25, 2.85, 0.48, fill=TEAL2, radius=0.5)
+        tb = textbox(s, x, 6.25, 2.85, 0.48, anchor=MSO_ANCHOR.MIDDLE)
+        para(tb.text_frame, True, [(n, BODY_FONT, 12, True, WHITE)], align=PP_ALIGN.CENTER)
+        x += 3.0
+    notes(s, "Slide 1 (~60 s, Akif): State the question. Our first answer is no: on three "
+             "dialogues, labels did not raise ROUGE and the error types moved around. The "
+             "proposal was a five-stage system without a single question; after your feedback "
+             "we kept one question and dropped NER, fine-tuning and the Turkish dataset.")
 
 
-def s4_arch(prs):
-    s = base(prs, "ARCHITECTURE", "Four modules, one shared JSON format")
-    steps = [("1", "Speech → text", "WhisperX + pyannote", "Alp · off-the-shelf"),
-             ("2", "Role assignment", "TF-IDF + logistic reg.", "Yusuf · our model"),
-             ("3", "SOAP note", "Qwen2.5-7B, 4-bit, prompt", "Ali · off-the-shelf"),
-             ("4", "Demo", "Gradio", "Akif · interface")]
+def s2_system(prs):
+    s = base(prs, "SYSTEM AND WHAT IS IMPLEMENTED", "Four modules, one shared JSON format")
+    steps = [("1", "Speech → text", "WhisperX + pyannote", "Alp · pretrained, no training", "implemented"),
+             ("2", "Role assignment", "TF-IDF + logistic regression", "Yusuf · trained by us", "implemented"),
+             ("3", "SOAP note", "Qwen2.5-7B 4-bit + frozen prompt", "Ali · pretrained, prompting", "implemented"),
+             ("4", "Demo", "Gradio, runs on one Colab T4", "Akif · interface", "text input works")]
     x = 0.55
-    for i, (n, head, tool, who) in enumerate(steps):
+    for i, (n, head, tool, who, status) in enumerate(steps):
         own = n == "2"
-        rect(s, x, 1.9, 2.75, 1.75, fill=TEAL if own else WHITE, line=SOFT, radius=0.08, line_w=1.25)
+        rect(s, x, 1.75, 2.8, 2.1, fill=TEAL if own else WHITE, line=SOFT, radius=0.06, line_w=1.25)
         fg, sub = (WHITE, SOFT) if own else (INK, MUTED)
-        tb = textbox(s, x + 0.15, 2.0, 2.45, 1.6)
+        tb = textbox(s, x + 0.15, 1.85, 2.5, 1.95)
         para(tb.text_frame, True, [(n + "  " + head, BODY_FONT, 15, True, fg)])
         para(tb.text_frame, False, [(tool, BODY_FONT, 11.5, False, fg)], space_before=6)
         para(tb.text_frame, False, [(who, BODY_FONT, 10.5, False, sub)], space_before=6)
+        para(tb.text_frame, False, [("● " + status, BODY_FONT, 10.5, True, MINT if not own else WHITE)],
+             space_before=8)
         if i < 3:
-            tb = textbox(s, x + 2.75, 2.45, 0.45, 0.6, anchor=MSO_ANCHOR.MIDDLE)
-            para(tb.text_frame, True, [("→", BODY_FONT, 22, True, TEAL2)], align=PP_ALIGN.CENTER)
+            tb = textbox(s, x + 2.8, 2.5, 0.35, 0.6, anchor=MSO_ANCHOR.MIDDLE)
+            para(tb.text_frame, True, [("→", BODY_FONT, 20, True, TEAL2)], align=PP_ALIGN.CENTER)
         x += 3.15
-    card(s, 0.55, 4.0, 7.3, 3.0)
-    label(s, 0.8, 4.12, 6.8, "EVERY MODULE READS AND WRITES THIS")
-    lines(s, 0.8, 4.48, 6.9, 2.45, [
-        '{"dialogue_id": "aci_001", "source": "aci-bench",',
-        ' "segments": [',
-        '   {"id": 0, "speaker": "SPEAKER_00", "start": 0.0,',
-        '    "gold_role": "Doctor", "role": "Doctor",',
-        '    "role_prob": 0.94, "text": "Any chest pain?"}, ...]}',
+    card(s, 0.55, 4.15, 7.4, 2.8)
+    label(s, 0.8, 4.27, 6.9, "EVERY MODULE READS AND WRITES THIS")
+    lines(s, 0.8, 4.65, 7.0, 2.2, [
+        '{"dialogue_id": "aci_002", "source": "aci-bench",',
+        ' "segments": [{"id": 4, "speaker": "SPEAKER_00",',
+        '   "gold_role": "Doctor", "role": "Doctor", "role_prob": 0.91,',
+        '   "text": "have you noticed any rashes?"}, ...]}',
     ], size=11, gap=1, font=MONO)
-    card(s, 8.15, 4.0, 4.6, 3.0, accent=MINT)
-    label(s, 8.4, 4.12, 4.1, "WHY IT WORKED FOR 4 PEOPLE")
-    lines(s, 8.4, 4.5, 4.2, 2.4, [
-        "One function per module, fixed signature",
-        "check_format() before every push",
-        "Mock functions: the demo ran before the real modules existed",
+    card(s, 8.25, 4.15, 4.5, 2.8, accent=MINT)
+    label(s, 8.5, 4.27, 4.0, "DEMO STATUS")
+    lines(s, 8.5, 4.65, 4.1, 2.2, [
+        "Pasted A/B text → roles → SOAP note works end to end.",
+        "Audio input is not connected yet.",
+        "Modules plug in by file name; mocks kept the demo running before they existed.",
     ], size=12, gap=8)
-    notes(s, "Slide 4 (~45 s, Akif): Four steps. ASR and the LLM are off-the-shelf; the "
-             "role classifier is ours. All modules exchange one JSON format, so each of us "
-             "worked independently with mock functions and we integrated at the end.")
+    notes(s, "Slide 2 (~45 s, Akif): Four modules. ASR and the LLM are pretrained; the role "
+             "classifier is trained by us. They exchange one JSON format. The demo works on "
+             "pasted text; audio is the next step.")
 
 
-def s5_asr(prs):
-    s = base(prs, "STEP 1  ·  SPEECH → TEXT", "Who spoke when: WhisperX + pyannote")
-    stat(s, 0.55, 1.85, "93.8%", "speaker accuracy, 1,923 / 2,050\nutterances (20 PriMock57 visits)")
-    stat(s, 3.65, 1.85, "96.7%", "on utterances longer\nthan 1 second")
-    stat(s, 6.75, 1.85, "87.8%", "on short utterances\n(< 1 s, interruptions)")
-    stat(s, 9.85, 1.85, "≈", "Whisper small vs medium:\n96.0% vs 96.5%")
-    card(s, 0.55, 3.45, 5.95, 3.4, accent=TEAL)
-    label(s, 0.8, 3.58, 5.5, "SETUP")
-    lines(s, 0.8, 3.95, 5.55, 2.8, [
-        "PriMock57 mock consultations (ACL 2022) instead of our own recordings",
-        "Doctor and patient channels mixed into one track; gold speaker from channel energy",
-        "Whisper small + alignment, pyannote community-1 diarization, no training",
-    ], size=12, gap=8)
-    card(s, 6.8, 3.45, 5.95, 3.4, accent=MINT)
-    label(s, 7.05, 3.58, 5.5, "OBSERVATIONS")
-    lines(s, 7.05, 3.95, 5.55, 2.8, [
-        "Errors cluster on short turns and interruptions",
-        "One person reading both roles → found as one speaker",
-        "ASR slips on clinical words (“start” → “stop”)",
-        "Output order of SPEAKER_00 / 01 is arbitrary → roles must come from text",
-    ], size=12, gap=8)
-    notes(s, "Slide 5 (~60 s, Alp) — DRAFT built from asr/README.md and results/kisi1_*.csv; "
-             "Alp, please check. Key line: speaker separation is good enough (94%), errors are "
-             "on short turns, and the labels SPEAKER_00/01 say nothing about who the doctor is.")
-
-
-def s6_roles(prs, m):
-    f = m["group_5fold"]
-    s = base(prs, "STEP 2  ·  ROLE ASSIGNMENT (OUR MODEL)", "Who is the doctor? Predicted from text")
-    card(s, 0.55, 1.85, 6.0, 2.55, accent=TEAL)
-    label(s, 0.8, 1.98, 5.5, "METHOD")
-    lines(s, 0.8, 2.35, 5.6, 2.0, [
-        "All utterances of one speaker → one document",
-        "Word 1–2-gram + char 3–5-gram TF-IDF → logistic regression",
-        "Two speakers: exactly one Doctor, one Patient",
-    ], size=12, gap=7)
-    card(s, 0.55, 4.6, 6.0, 2.3, accent=MINT)
-    label(s, 0.8, 4.72, 5.5, "DATA AND EVALUATION")
-    lines(s, 0.8, 5.08, 5.6, 1.8, [
-        "ACI-Bench, 67 encounters; split by encounter, no leakage",
-        "5-fold group cross-validation, speaker level",
-        "Swapping A/B labels swaps the prediction: it reads text, not names",
-    ], size=12, gap=7)
-    stat(s, 7.0, 1.85, f"{f['accuracy_mean']*100:.1f}%", f"accuracy, 5-fold mean\n(± {f['accuracy_std']*100:.1f})", w=2.8)
-    stat(s, 9.9, 1.85, f"{f['macro_f1_mean']:.2f}", "macro-F1, 5-fold mean", w=2.8)
-    card(s, 7.0, 3.45, 5.75, 3.45)
-    label(s, 7.25, 3.58, 5.3, "HOLD-OUT (14 ENCOUNTERS)")
-    cm = m["holdout"]["confusion_matrix"]
-    hdr = [("", "pred Doctor", "pred Patient"), ("Doctor", str(cm[0][0]), str(cm[0][1])),
-           ("Patient", str(cm[1][0]), str(cm[1][1]))]
-    for r, row in enumerate(hdr):
-        for c, v in enumerate(row):
-            x, y = 7.3 + c * 1.75, 4.0 + r * 0.6
-            if r and c:
-                rect(s, x, y, 1.6, 0.5, fill=SOFT if r != c else TEAL, radius=0.15)
-            tb = textbox(s, x, y, 1.6, 0.5, anchor=MSO_ANCHOR.MIDDLE)
-            col = WHITE if (r and c and r == c) else (MUTED if not (r and c) else INK)
-            para(tb.text_frame, True, [(v, BODY_FONT, 12, bool(r and c), col)], align=PP_ALIGN.CENTER)
-    lines(s, 7.25, 5.95, 5.3, 0.9, [
-        f"Hold-out accuracy {m['holdout']['accuracy']*100:.0f}%; the 5-fold mean is the "
-        "number we report."], size=11, color=MUTED)
-    notes(s, "Slide 6 (~90 s, Yusuf) — DRAFT built from roles/README.md and "
-             "results/kisi2_role_metrics.json; Yusuf, please check. Key line: each speaker's "
-             "text is classified as a whole; 92.5% mean accuracy over 5 folds split by "
-             "encounter. Plan deviation: trained on ACI-Bench, not MTS-Dialog.")
-
-
-def s9_demo(prs, demo):
-    s = base(prs, "LIVE DEMO", "Paste a dialogue, get roles and a note")
-    for i, (h, d) in enumerate([("Paste", "Speakers are only “A:” and “B:”"),
-                                ("Run", "Our model decides who the doctor is"),
-                                ("Read", "Colored transcript + S / O / A / P note")]):
-        y = 1.95 + i * 1.0
-        chip(s, 0.55, y, str(i + 1))
-        tb = textbox(s, 1.05, y - 0.06, 3.6, 0.9)
-        para(tb.text_frame, True, [(h, BODY_FONT, 14, True, INK)])
-        para(tb.text_frame, False, [(d, BODY_FONT, 11.5, False, MUTED)])
-    lines(s, 0.55, 5.2, 4.1, 1.6, [
-        "Runs on one Colab T4: Whisper + 4-bit 7B LLM + TF-IDF.",
-        "Audio upload: next step.",
+def s3_data(prs, ev, asr):
+    c = ev["counts"]
+    s = base(prs, "DATA AS LOADED", "Published ACI-Bench splits, frozen test set")
+    rows = [["ACI-Bench (CC BY 4.0)", "encounters", "speakers", "utterances", "used for"],
+            ["train  ·  train.csv", c["train"]["encounters"], c["train"]["speakers"], f"{c['train']['utterances']:,}",
+             "role model training"],
+            ["dev  ·  valid.csv", c["dev"]["encounters"], c["dev"]["speakers"], f"{c['dev']['utterances']:,}",
+             "model choice"],
+            ["test  ·  taskB_test1.csv", c["test"]["encounters"], c["test"]["speakers"], f"{c['test']['utterances']:,}",
+             "frozen, run once"]]
+    table(s, 0.55, 1.75, [3.1, 1.35, 1.35, 1.4, 2.4], rows, row_h=0.48, size=12, bold_rows=(3,))
+    lines(s, 0.55, 3.8, 9.6, 1.0, [
+        "Preprocessing: [doctor]/[patient] tags → roles; [patient_guest] lines dropped (38 dev, 50 test). "
+        "No other filtering.",
+        f"PriMock57 (ASR only): 20 consultations, first 5 min, {asr['total']:,} utterances; gold speaker "
+        "from channel energy.",
     ], size=11.5, color=MUTED, gap=6)
-    card(s, 4.95, 1.85, 7.8, 5.05)
-    label(s, 5.2, 1.98, 7.3, "REAL OUTPUT OF OUR ROLE MODEL ON THE DEMO TEXT")
-    y = 2.4
-    for seg in demo["segments"][:6]:
-        doc = seg["role"] == "Doctor"
-        rect(s, 5.2, y, 7.3, 0.56, fill=SOFT if doc else WHITE, line=SOFT, radius=0.15)
-        tb = textbox(s, 5.3, y, 7.1, 0.56, anchor=MSO_ANCHOR.MIDDLE)
-        txt = seg["text"] if len(seg["text"]) < 70 else seg["text"][:67] + "…"
-        para(tb.text_frame, True, [(("Doctor  " if doc else "Patient  "), BODY_FONT, 11, True, TEAL if doc else TEAL2),
-                                   (f"{seg['speaker']}  ", MONO, 10, False, MUTED),
-                                   (txt, BODY_FONT, 11, False, INK)])
-        y += 0.63
-    pa = {g["speaker"]: g["role_prob"] for g in demo["segments"]}
-    lines(s, 5.2, 6.25, 7.3, 0.4, [f"P(doctor):  A = {pa['A']:.2f}   ·   B = {pa['B']:.2f}"],
-          size=11, color=MUTED)
-    notes(s, "Slide 9 (~2 min, Akif): Switch to the Gradio tab (opened before the talk). "
-             "Paste app/demo_metin.txt, press Run. Say: 'Only A and B are given; our model "
-             "decided A is the doctor.' Show the colors and probabilities, then the note: point "
-             "at one symptom in S and the plan in P. If anything fails, go to the next "
-             "(hidden) backup slide.")
+    card(s, 10.4, 1.75, 2.35, 2.0, accent=MINT)
+    tb = textbox(s, 10.6, 1.85, 2.05, 1.85)
+    para(tb.text_frame, True, [("FROZEN", BODY_FONT, 10.5, True, TEAL2)])
+    para(tb.text_frame, False, [("Test labels are not used for training, prompt changes or model "
+                                 "choice.", BODY_FONT, 11, False, INK)], space_before=4, line_spacing=1.08)
+    card(s, 0.55, 4.95, 12.2, 2.0)
+    label(s, 0.8, 5.05, 11, "ONE REAL EXAMPLE  ·  aci_002 (train D2N053), transcript and reference note")
+    lines(s, 0.8, 5.4, 6.4, 1.5, [
+        "[doctor] have you seen ever noticed any rashes either when it",
+        "  first started or intermittently?",
+        "[patient] on my body no not really",
+    ], size=10.5, gap=1, font=MONO)
+    lines(s, 7.4, 5.4, 5.2, 1.5, [
+        [("Reference note: ", True), ("“… Denies any rashes …”", False)],
+        "Target: the note must keep the patient's denial.",
+    ], size=11.5, gap=6)
+    notes(s, "Slide 3 (~45 s): We use ACI-Bench's published splits as they are: 67 train, 20 dev, "
+             "40 test encounters. The test file is frozen and run once. PriMock57 is only used "
+             "to measure speaker separation on audio.")
 
 
-def s9b_backup(prs, dlg, note):
-    s = base(prs, "BACKUP  ·  PRE-RECORDED OUTPUT (aci_002)", "Same pipeline, output captured before the talk")
-    card(s, 0.55, 1.85, 5.6, 5.05)
-    label(s, 0.8, 1.98, 5.2, "ROLES PREDICTED BY OUR MODEL")
-    tf = textbox(s, 0.8, 2.35, 5.2, 4.45).text_frame
-    for i, seg in enumerate(dlg["segments"][:15]):
-        t = seg["text"] if len(seg["text"]) < 62 else seg["text"][:59] + "…"
-        para(tf, i == 0, [(seg["role"] + ": ", BODY_FONT, 10.5, True, TEAL if seg["role"] == "Doctor" else TEAL2),
-                          (t, BODY_FONT, 10.5, False, INK)], space_after=3)
-    card(s, 6.45, 1.85, 6.3, 5.05, accent=MINT)
-    label(s, 6.7, 1.98, 5.8, "SOAP NOTE  ·  " + note["model"])
-    tf = textbox(s, 6.7, 2.35, 5.9, 4.45).text_frame
-    for i, k in enumerate("SOAP"):
-        v = note[k] if len(note[k]) < 210 else note[k][:207] + "…"
-        para(tf, i == 0, [(k + "   ", TITLE_FONT, 13, True, TEAL), (v, BODY_FONT, 10.5, False, INK)],
-             space_after=7)
-    s._element.set("show", "0")   # hidden slide
-    notes(s, "HIDDEN backup for slide 9. Use only if the live demo fails: 'Here is the output "
-             "we captured before the talk.' Roles come from our classifier (all 26 utterances "
-             "correct); the note was generated by Qwen2.5-7B on Colab.")
+def s4_asr(prs, asr):
+    s = base(prs, "STEP 1  ·  SPEECH → TEXT  (ALP)", "Who spoke when: WhisperX + pyannote")
+    stat(s, 0.55, 1.6, "93.8%", f"speaker accuracy, {asr['correct']:,} / {asr['total']:,}\nutterances, 20 PriMock57 consultations")
+    stat(s, 3.65, 1.6, "96.7%", "on utterances longer\nthan 1 second")
+    stat(s, 6.75, 1.6, "87.8%", "on short utterances\n(< 1 s)")
+    stat(s, 9.85, 1.6, "≈", "Whisper small vs medium model\ncomparison: 93.8% vs 94.1%")
+    card(s, 0.55, 3.15, 5.95, 3.15, accent=TEAL)
+    label(s, 0.8, 3.28, 5.5, "SETUP")
+    lines(s, 0.8, 3.65, 5.55, 2.6, [
+        "PriMock57 mock consultations (ACL 2022)",
+        "Doctor and patient channels mixed into one track",
+        "Whisper small + alignment, pyannote community-1 diarization, no training",
+        f"Spread over consultations: {asr['mean'] * 100:.1f} ± {asr['std'] * 100:.1f} pp (min {asr['min'] * 100:.1f}%)",
+    ], size=12, gap=8)
+    card(s, 6.8, 3.15, 5.95, 3.15, accent=MINT)
+    label(s, 7.05, 3.28, 5.5, "OBSERVATIONS")
+    lines(s, 7.05, 3.65, 5.55, 2.6, [
+        "Errors cluster on short turns",
+        "One person reading both roles → found as one speaker",
+        "SPEAKER_00 / 01 numbers carry no role information, so the role model (next step) "
+        "decides who is the doctor",
+    ], size=12, gap=8)
+    lines(s, 0.55, 6.5, 12.2, 0.5, ["Limitations: clean mock audio; gold labels from channel energy "
+                                    "(approximate); speaker accuracy only, not WER/DER."], size=11, color=MUTED)
+    notes(s, "Slide 4 (~45 s, Alp): Speaker separation is 93.8% on 20 consultations; errors are "
+             "on short turns; the SPEAKER_00/01 labels say nothing about who the doctor is. Small "
+             "and medium give the same speaker accuracy (93.8% vs 94.1%), so model size does not "
+             "matter here.")
 
 
-def s10_next(prs):
-    s = base(prs, "NEXT STEPS", "Until the final presentation")
-    items = [
-        ("Roles", "Fine-tune BERT and compare with TF-IDF; error analysis on 20–30 misclassified utterances."),
-        ("Experiment", "Grow with/without-roles to 20 held-out dialogues; ROUGE + BERTScore + error counts."),
-        ("Prompt", "Add a third-person summarisation rule — the echo problem from slide 8."),
-        ("Demo", "Connect audio upload: recording → transcript → roles → note."),
-    ]
+def s6_baseline(prs, ev, cv):
+    r = ev["results"]
+    s = base(prs, "BASELINE RESULTS  ·  FROZEN TEST SET", "Role assignment: near ceiling on clean transcripts")
+    rows = [["System (speaker level)", "dev  (20 enc.)", "test  (40 enc.)  [95% CI]"],
+            ["First speaker is the doctor", pct(r["first_speaker"]["dev"]["accuracy"]), ci(r["first_speaker"]["test"])],
+            ["More “you / your” is the doctor", pct(r["you_ratio"]["dev"]["accuracy"]), ci(r["you_ratio"]["test"])],
+            ["TF-IDF + LR, ours", pct(r["tfidf_lr"]["dev"]["accuracy"]), ci(r["tfidf_lr"]["test"])],
+            ["TF-IDF + LR, one utterance at a time", pct(r["utterance_tfidf_lr"]["dev"]["accuracy"]),
+             ci(r["utterance_tfidf_lr"]["test"])]]
+    table(s, 0.55, 1.7, [4.2, 1.9, 3.3], rows, row_h=0.55, size=12.5, bold_rows=(3,))
+    lines(s, 0.55, 4.6, 9.4, 0.9, [
+        f"Spread: 95% bootstrap interval over test encounters (2,000 resamples, seed 0). On train, "
+        f"5-fold grouped CV gives {cv['accuracy_mean'] * 100:.1f} ± {cv['accuracy_std'] * 100:.1f}.",
+    ], size=11, color=MUTED)
+    card(s, 10.2, 1.7, 2.55, 2.75, fill=INK)
+    tb = textbox(s, 10.35, 1.82, 2.3, 2.55)
+    para(tb.text_frame, True, [("1 / 40", TITLE_FONT, 30, True, WHITE)])
+    para(tb.text_frame, False, [("test encounter wrong for our model (D2N114); the “you” rule makes the "
+                                 "same mistake", BODY_FONT, 11, False, SOFT)], space_before=4, line_spacing=1.08)
+    card(s, 0.55, 5.4, 12.2, 1.55, accent=MINT)
+    label(s, 0.8, 5.5, 11, "WHAT THIS MEANS")
+    lines(s, 0.8, 5.85, 11.7, 1.1, [
+        "Our model ties a one-line rule on ACI-Bench, so a clean transcript is not where it is needed. "
+        "One utterance alone is only 86.8% right: pooling a speaker's turns is what makes the task easy. "
+        "The real test is diarized ASR output, where the turn order is wrong for short turns.",
+    ], size=12, gap=4)
+    notes(s, "Slide 6 (~75 s, Yusuf): Test set is ACI-Bench task B test 1, 40 encounters, run "
+             "once. Our TF-IDF model gets 97.5%, the same as a rule that picks the speaker who "
+             "says 'you' more; first speaker gets 95%. Per utterance the same features give 86.8%. "
+             "So pooling per speaker is the useful part, and we need harder input to separate the "
+             "systems.")
+
+
+def s7_errors(prs, ev):
+    e = ev["utterance_errors_test"]
+    total_utts = ev["counts"]["test"]["utterances"]
+    s = base(prs, "ERROR ANALYSIS  ·  TEST SET", f"{e['total']} utterance-level errors, grouped")
+    cats = list(e["by_category"].items())
+    data = CategoryChartData()
+    data.categories = [c for c, _ in cats][::-1]
+    data.add_series("errors", [n for _, n in cats][::-1])
+    gf = s.shapes.add_chart(XL_CHART_TYPE.BAR_CLUSTERED, Inches(0.45), Inches(1.6), Inches(6.4), Inches(3.6), data)
+    ch = gf.chart
+    ch.has_legend = False
+    ch.font.size = Pt(11)
+    ch.font.name = BODY_FONT
+    pl = ch.plots[0]
+    pl.gap_width = 60
+    pl.has_data_labels = True
+    pl.data_labels.position = XL_LABEL_POSITION.OUTSIDE_END
+    pl.data_labels.font.size = Pt(11)
+    pl.data_labels.font.bold = True
+    ser = pl.series[0]
+    ser.format.fill.solid()
+    ser.format.fill.fore_color.rgb = TEAL
+    ch.value_axis.visible = False
+    ch.value_axis.has_major_gridlines = False
+    ch.category_axis.format.line.fill.background()
+    ch.category_axis.tick_labels.font.color.rgb = INK
+    lines(s, 0.55, 5.25, 6.3, 0.5, [f"{e['total']} of {total_utts:,} test utterances "
+                                     f"({e['total'] / total_utts * 100:.1f}%); rule-based categories, "
+                                     "full list in results/kisi4_utterance_errors.csv"], size=10, color=MUTED)
+    card(s, 7.1, 1.6, 5.65, 4.1)
+    label(s, 7.35, 1.72, 5.2, "ONE EXAMPLE PER CATEGORY")
+    tf = textbox(s, 7.35, 2.08, 5.25, 3.55).text_frame
+    for i, (c, _) in enumerate(cats):
+        ex = e["examples"][c]
+        ex = ex if len(ex) < 80 else ex[:77] + "…"
+        para(tf, i == 0, [(c.split(" (")[0] + ":  ", BODY_FONT, 10.5, True, TEAL), (f"“{ex}”", BODY_FONT, 10.5, False, INK)],
+             space_after=6, line_spacing=1.05)
+    card(s, 0.55, 5.85, 12.2, 1.15, accent=MINT)
+    label(s, 0.8, 5.93, 11, "WHAT THEY SUGGEST")
+    lines(s, 0.8, 6.27, 11.7, 0.75, [
+        "Backchannels (“okay.”) carry no role signal → never decide per utterance, pool per speaker. "
+        "Patients also say “you” and ask questions → the “you” rule and question counts break on short "
+        "or role-reversed dialogues."], size=11.5)
+    notes(s, "Slide 7 (~60 s): 269 errors when every utterance is classified alone. The biggest "
+             "group is short backchannels like 'okay', which no text model can place. Patients "
+             "addressing the doctor with 'you' and asking questions are next: these are also the "
+             "cases that would break the simple rule baselines. Categories are assigned by rules; "
+             "we will hand-check a sample of 30 before the final.")
+
+
+def s9_experiment(prs, rouge):
+    s = base(prs, "METHOD STATUS  ·  FIRST NUMBERS ON DEV (ALI)", "With roles vs without: same model, same prompt")
+    rows = [["ROUGE vs reference note", "R-1", "R-2", "R-L"]]
+    for cond, name in (("rolsuz", "Without labels (baseline)"), ("rollu", "With Doctor/Patient labels")):
+        rows.append([name] + [f"{rmean(rouge, cond, m):.3f}" for m in ("rouge1", "rouge2", "rougeL")])
+    table(s, 0.55, 1.7, [3.6, 1.1, 1.1, 1.1], rows, row_h=0.5, size=12.5)
+    lines(s, 0.55, 3.3, 6.9, 0.6, ["Mean of 3 dialogues (D2N050, D2N053, D2N060 from the train split), "
+                                   "Qwen2.5-7B-Instruct 4-bit, temperature 0, frozen prompt v1."],
+          size=10.5, color=MUTED)
+    card(s, 0.55, 4.05, 6.9, 2.9, accent=TEAL)
+    label(s, 0.8, 4.17, 6.4, "ONE CONTROLLED CHANGE")
+    lines(s, 0.8, 4.52, 6.5, 2.4, [
+        "Only the transcript changes: “Doctor: … / Patient: …” vs plain lines in the same order.",
+        "Prompt, model, decoding and data are identical.",
+        "ROUGE barely moves (≤ 0.005), so we read every note side by side →",
+    ], size=12, gap=8)
+    card(s, 7.75, 1.7, 5.0, 5.25)
+    label(s, 8.0, 1.82, 4.6, "WHAT THE 6 NOTES SHOWED")
+    items = [("With labels", "1 of 3 notes echoed the transcript (aci_003: 3,229 chars, 7 of 9 S sentences "
+                             "in first person)"),
+             ("Without labels", "1 of 3 lost negation scope (aci_002: “no joint pain, fever, weight loss”)"),
+             ("Both", "118/72 written as 180/72; “push fluids” added though nobody said it")]
+    tf = textbox(s, 8.0, 2.2, 4.6, 4.6).text_frame
     for i, (h, d) in enumerate(items):
-        x, y = 0.55 + (i % 2) * 6.2, 1.9 + (i // 2) * 2.35
-        card(s, x, y, 5.95, 2.1, accent=TEAL if i % 3 == 0 else MINT)
-        chip(s, x + 0.25, y + 0.25, str(i + 1))
-        tb = textbox(s, x + 0.8, y + 0.2, 4.95, 1.8)
-        para(tb.text_frame, True, [(h, BODY_FONT, 15, True, INK)])
-        para(tb.text_frame, False, [(d, BODY_FONT, 12.5, False, MUTED)], space_before=6, line_spacing=1.1)
-    lines(s, 0.55, 6.75, 12, 0.4, ["Thank you — questions?"], size=13, color=TEAL)
-    notes(s, "Slide 10 (~45 s, Yusuf): BERT vs TF-IDF and error analysis; the experiment "
-             "grows to 20 dialogues that the role model never saw in training; prompt fix for "
-             "the echo problem; audio input in the demo.")
+        para(tf, i == 0, [(h, BODY_FONT, 13, True, INK)], space_before=0 if i == 0 else 10)
+        para(tf, False, [(d, BODY_FONT, 11.5, False, MUTED)], line_spacing=1.08)
+    notes(s, "Slide 9 (~60 s, Ali): First numbers on three development dialogues. Without labels "
+             "is our baseline, with labels is the method; the transcript is the only change. ROUGE "
+             "is flat. Reading the notes, labels fixed a negation error but caused an echo on the "
+             "longest dialogue. ROUGE cannot see these errors, so the final uses error counts too.")
+
+
+PLAN = [("Run with/without labels on the 40 frozen test dialogues; ROUGE + BERTScore", "Ali", "Nov 26"),
+        ("Ablation: anonymous A/B labels (turns, no roles) as a 3rd condition", "Ali", "Nov 26"),
+        ("Attribution-error checklist; 2 people label 10 notes for agreement", "Akif + Ali", "Dec 3"),
+        ("BERT role classifier vs TF-IDF on the same frozen test", "Yusuf", "Nov 26"),
+        ("Hand-check 30 utterance errors; roles on diarized ASR output", "Yusuf + Alp", "Dec 3"),
+        ("Predicted vs gold roles into the note (error propagation)", "Alp + Ali", "Dec 10"),
+        ("Audio input in the demo; report skeleton", "Akif", "Dec 10")]
+
+
+def s10_plan(prs):
+    s = base(prs, "PLAN TO THE FINAL", "Remaining experiments, owners and dates")
+    table(s, 0.55, 1.6, [6.4, 1.5, 1.2], [["Experiment", "Owner", "Date"]] + [list(p) for p in PLAN],
+          row_h=0.5, size=11.5)
+    card(s, 9.95, 1.6, 2.8, 2.45, fill=INK)
+    tb = textbox(s, 10.1, 1.72, 2.55, 2.25)
+    para(tb.text_frame, True, [("ABLATION", BODY_FONT, 10.5, True, MINT)])
+    para(tb.text_frame, False, [("No speaker info  →  anonymous A/B  →  Doctor/Patient. Separates "
+                                 "“knowing the turns” from “knowing the roles”.", BODY_FONT, 11.5, False, WHITE)],
+         space_before=4, line_spacing=1.08)
+    card(s, 9.95, 4.2, 2.8, 2.75, accent=MINT)
+    tb = textbox(s, 10.15, 4.3, 2.5, 2.6)
+    para(tb.text_frame, True, [("BIGGEST RISK", BODY_FONT, 10.5, True, TEAL2)])
+    para(tb.text_frame, False, [("ROUGE cannot see who-said-what errors, so a real effect looks like "
+                                 "noise.", BODY_FONT, 11, False, INK)], space_before=3, line_spacing=1.05)
+    para(tb.text_frame, False, [("Fallback: ", BODY_FONT, 11, True, INK),
+                                ("count negation flips and question→complaint errors with a fixed "
+                                 "checklist.", BODY_FONT, 11, False, INK)], space_before=5, line_spacing=1.05)
+    notes(s, "Slide 10 (~45 s, Yusuf): Each remaining step has an owner and a date. The ablation "
+             "adds anonymous A/B labels between 'no speaker info' and 'roles'. The main risk is "
+             "that ROUGE does not see attribution errors; the fallback is a fixed error checklist "
+             "with a small agreement check.")
+
+
+# ------------------------------------------------------------------ project card
+def card_slide(prs, idx, fields):
+    s = base(prs, f"PART 2  ·  PROJECT CARD  ({idx} / 4)", "")
+    y = 0.85
+    for (num, name, h, body) in fields:
+        card(s, 0.55, y, 12.2, h)
+        rect(s, 0.75, y + 0.17, 0.42, 0.42, fill=TEAL, radius=0.5)
+        tb = textbox(s, 0.75, y + 0.17, 0.42, 0.42, anchor=MSO_ANCHOR.MIDDLE)
+        para(tb.text_frame, True, [(str(num), BODY_FONT, 11, True, WHITE)], align=PP_ALIGN.CENTER)
+        tb = textbox(s, 1.3, y + 0.12, 11.3, 0.4)
+        para(tb.text_frame, True, [(name, BODY_FONT, 14, True, INK)])
+        if body:
+            tf = textbox(s, 1.3, y + 0.5, 11.3, h - 0.58).text_frame
+            for i, it in enumerate(body):
+                runs = [(it, False)] if isinstance(it, str) else it
+                para(tf, i == 0, [(t, BODY_FONT, 10.5, b, INK) for t, b in runs], space_after=2, line_spacing=1.04)
+        y += h + 0.15
+    return s
+
+
+def project_card(prs, ev, cv, asr, rouge):
+    r = ev["results"]
+    rl = lambda c: f"{rmean(rouge, c, 'rougeL'):.3f}"   # noqa: E731
+    card_slide(prs, 1, [
+        (1, "Title and abstract", 2.45, [
+            [("MedScribe: Do speaker roles help an LLM write clinical notes?", True)],
+            "Ambient scribes turn a doctor–patient conversation into a SOAP note, but diarization only gives "
+            "anonymous speakers. We train a text-based role classifier (TF-IDF + logistic regression; "
+            f"{pct(r['tfidf_lr']['test']['accuracy'])} speaker accuracy on the frozen ACI-Bench test) and test whether "
+            "Doctor/Patient labels change the note an open LLM (Qwen2.5-7B) writes from the same transcript. "
+            "On three development dialogues, labels did not change ROUGE (R-L "
+            f"{rl('rollu')} vs {rl('rolsuz')}) but shifted the error types. On the 40-dialogue test set, labels "
+            "[RESULT: ROUGE / BERTScore / attribution errors, with vs without vs anonymous A/B]. (≈120 words)"]),
+        (2, "Research question", 1.45, [
+            "Do Doctor/Patient speaker labels make an LLM write a better SOAP note? First result: no, not on "
+            "average (3 dev dialogues). Changed: the proposal was a 5-stage system with no single question; "
+            "narrowed after feedback (NER, fine-tuning, Turkish data dropped)."]),
+        (3, "Contributions (testable claims)", 2.05, [
+            "C1. Labels reduce attribution errors (negation flips, questions written as complaints) on the "
+            "40 test dialogues, even when ROUGE is unchanged.",
+            "C2. Most of any gain comes from turn structure: anonymous A/B labels close at least half of the gap "
+            "between no speaker info and roles.",
+            "C3. Pooling a speaker's turns, not per-utterance classification, is what makes role assignment "
+            f"accurate ({pct(r['utterance_tfidf_lr']['test']['accuracy'])} → {pct(r['tfidf_lr']['test']['accuracy'])})."]),
+    ])
+    card_slide(prs, 2, [
+        (4, "Related work (how we differ)", 3.05, [
+            "Krishna et al., ACL-IJCNLP 2021 — Generating SOAP notes from doctor–patient conversations using "
+            "modular summarization. Fine-tuned extract-then-abstract; we prompt an open LLM and isolate role labels.",
+            "Yim et al., Scientific Data 2023 — ACI-BENCH. Benchmark we use; we add a role-label ablation on it.",
+            "Ben Abacha et al., EACL 2023 — An empirical study of clinical note generation (MTS-Dialog). Section "
+            "generation; we study one input factor, speaker roles.",
+            "Ben Abacha et al., ClinicalNLP 2023 — Overview of MEDIQA-Chat 2023. Shared task systems; none "
+            "separates the effect of role tags.",
+            "Korfiatis et al., ACL 2022 — PriMock57. Audio corpus we use only for speaker separation.",
+            "Bain et al., Interspeech 2023 — WhisperX; Bredin et al., ICASSP 2020 — pyannote. Tools we use "
+            "as is; we solve the role mapping they leave open."]),
+        (5, "Data", 2.4, [
+            f"ACI-Bench, CC BY 4.0. As loaded: train {ev['counts']['train']['encounters']} enc. / "
+            f"{ev['counts']['train']['utterances']:,} utt.; dev {ev['counts']['dev']['encounters']} / "
+            f"{ev['counts']['dev']['utterances']:,}; test (clinicalnlp_taskB_test1, frozen) "
+            f"{ev['counts']['test']['encounters']} / {ev['counts']['test']['utterances']:,}.",
+            "Preprocessing: [patient_guest] lines dropped (dev 38, test 50); encounters unchanged.",
+            f"PriMock57 (licence: not decided yet — to check): 20 consultations, first 5 min, {asr['total']:,} "
+            "utterances. Example: [doctor] have you … noticed any rashes? / [patient] on my body no not really.",
+            "No data labelled by us yet; the attribution-error checklist will report agreement on 10 notes."]),
+    ])
+    card_slide(prs, 3, [
+        (6, "Method and baseline", 1.45, [
+            "Baseline: note from the transcript without speaker labels. Method: same transcript with Doctor/"
+            "Patient labels from our classifier (gold labels for the controlled run). The one change: the labels.",
+            "Compute used: 1 Colab T4, ~1–2 min per note (4-bit 7B); roles on CPU in ~5 s. Needed: ~4 T4-hours "
+            "for 40 dialogues × 3 conditions."]),
+        (7, "Evaluation protocol (fixed before method results)", 1.4, [
+            "Metrics: ROUGE-1/2/L, BERTScore vs reference note; attribution-error count per note (checklist). "
+            "Test: ACI-Bench taskB_test1, 40 dialogues, frozen. Temperature 0 (one run); spread by paired "
+            "bootstrap over dialogues (2,000, seed 0). Real difference = paired 95% CI excludes 0."]),
+        (8, "Results so far (final table)", 3.0, []),
+    ])
+    s = prs.slides[-1]
+    rows = [["System", "Roles: speaker acc. (test)", "Note R-L (dev, n=3)", "Note R-L (test, n=40)", "Attribution errors"],
+            ["First speaker rule", ci(r["first_speaker"]["test"]), "–", "–", "–"],
+            ["TF-IDF + LR roles (ours)", ci(r["tfidf_lr"]["test"]), "–", "–", "–"],
+            ["Note, no speaker info (baseline)", "–", rl("rolsuz"), "", ""],
+            ["Note, anonymous A/B", "–", "", "", ""],
+            ["Note, Doctor/Patient labels", "–", rl("rollu"), "", ""]]
+    table(s, 1.3, 4.55, [3.0, 2.4, 1.75, 1.8, 2.0], rows, row_h=0.33, size=10)
+
+    card_slide(prs, 4, [
+        (9, "Error analysis", 1.45, [
+            f"{ev['utterance_errors_test']['total']} test errors of the per-utterance role model, grouped: " +
+            "; ".join(f"{c.split(' (')[0]} {n}" for c, n in ev["utterance_errors_test"]["by_category"].items()) +
+            ". Example: “okay.” (short backchannel). Notes: 1 echo, 1 negation-scope, 1 number, 1 added fact (6 notes)."]),
+        (10, "Research lead section", 1.35, [
+            "Research lead: not decided yet. Two recent papers: ACI-BENCH (Yim et al. 2023) and MEDIQA-Chat 2023 "
+            "(Ben Abacha et al.); both report note quality without isolating speaker labels. We run the "
+            "ablation no-speaker / anonymous A/B / roles."]),
+        (11, "Plan and risk", 1.4, [
+            "; ".join(f"{a} — {o}, {d}" for a, o, d in PLAN[:4]) + "; …(full list on slide 10). Risk: ROUGE "
+            "blind to attribution errors → fallback checklist. Feedback response: scope narrowed to one question."]),
+        (12, "Reproducibility", 1.65, [
+            f"Repo: {REPO}.  Field 8: python -m eval.role_eval (roles) and python -m notes.generate_note "
+            "--experiment (notes, needs GPU). Seeds: bootstrap 0, LLM temperature 0. Versions: Python 3.12, "
+            "scikit-learn ≥1.4, transformers + bitsandbytes (Colab), WhisperX.",
+            "Who did what: Alp ASR; Yusuf roles; Ali notes and experiment; Akif shared format, demo, evaluation "
+            "and slides. AI tools: Claude (Anthropic) for planning, code scaffolding and slide drafts; all "
+            "outputs checked by the team."]),
+    ])
 
 
 def main():
-    from app.pipeline import parse_text
-    from roles.assign_roles import assign_roles
-
+    ev, cv, asr, rouge = load_all()
     prs = Presentation()
     prs.slide_width, prs.slide_height = Inches(13.333), Inches(7.5)
-
-    m = json.load(open(os.path.join(ROOT, "results", "kisi2_role_metrics.json")))
-    demo = assign_roles(parse_text(open(os.path.join(ROOT, "app", "demo_metin.txt")).read()))
-    dlg = json.load(open(os.path.join(ROOT, "notes", "data", "aci_002.json")))
-    for seg in dlg["segments"]:
-        seg["role"] = None
-    dlg = assign_roles(dlg)
-    note = json.load(open(os.path.join(ROOT, "notes", "outputs", "aci_002_rollu.json")))
-
-    s1_title(prs); s2_problem(prs); s3_scope(prs); s4_arch(prs)
-    s5_asr(prs); s6_roles(prs, m)
-    slide_notes_generation(prs); slide_experiment(prs)
-    s9_demo(prs, demo); s9b_backup(prs, dlg, note); s10_next(prs)
-
-    out = os.path.join(ROOT, "results", "medscribe_interim.pptx")
+    s1_rq(prs, rouge)
+    s2_system(prs)
+    s3_data(prs, ev, asr)
+    s4_asr(prs, asr)
+    slide_method(prs)                 # 5 — Person 2, unchanged
+    s6_baseline(prs, ev, cv)
+    s7_errors(prs, ev)
+    slide_notes_generation(prs)       # 8 — Person 3, unchanged
+    s9_experiment(prs, rouge)
+    s10_plan(prs)
+    project_card(prs, ev, cv, asr, rouge)
+    out = R("results", "medscribe_midproject.pptx")
     prs.save(out)
     print("->", out, len(prs.slides._sldIdLst), "slides")
 
