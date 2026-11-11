@@ -9,6 +9,7 @@ Reuses Person 2's method slide and Person 3's note slide unchanged.
     python -m app.build_deck   ->  results/medscribe_midproject.pptx
 """
 import csv
+import re
 import json
 import os
 import statistics as st
@@ -26,7 +27,6 @@ from roles.build_slides import slide_method
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MONO = "Courier New"
-TEAM = os.environ.get("TEAM", "Team ##")
 REPO = "github.com/Pikseel/medscribe"
 
 
@@ -134,7 +134,7 @@ def s1_rq(prs, rouge):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     rect(s, 0, 0, 13.333, 7.5, fill=INK)
     tb = textbox(s, 0.7, 0.45, 12, 0.35)
-    para(tb.text_frame, True, [(f"CSE 484 MID-PROJECT  ·  {TEAM.upper()}  ·  MEDSCRIBE", BODY_FONT, 12, True, MINT)])
+    para(tb.text_frame, True, [("CSE 484 MID-PROJECT  ·  MEDSCRIBE", BODY_FONT, 12, True, MINT)])
     label(s, 0.7, 1.05, 6, "RESEARCH QUESTION", color=SOFT)
     tb = textbox(s, 0.7, 1.4, 11.9, 1.4)
     para(tb.text_frame, True, [("Do Doctor / Patient speaker labels make an LLM write a "
@@ -171,10 +171,10 @@ def s1_rq(prs, rouge):
 
 def s2_system(prs):
     s = base(prs, "SYSTEM AND WHAT IS IMPLEMENTED", "Four modules, one shared JSON format")
-    steps = [("1", "Speech → text", "WhisperX + pyannote", "Alp · pretrained, no training", "implemented"),
-             ("2", "Role assignment", "TF-IDF + logistic regression", "Yusuf · trained by us", "implemented"),
-             ("3", "SOAP note", "Qwen2.5-7B 4-bit + frozen prompt", "Ali · pretrained, prompting", "implemented"),
-             ("4", "Demo", "Gradio, runs on one Colab T4", "Akif · interface", "text input works")]
+    steps = [("1", "Speech → text", "WhisperX + pyannote", "Alp · ASR lead · pretrained, no training", "implemented"),
+             ("2", "Role assignment", "TF-IDF + logistic regression", "Yusuf · roles lead · trained by us", "implemented"),
+             ("3", "SOAP note", "Qwen2.5-7B 4-bit + frozen prompt", "Ali · notes lead · pretrained, prompting", "implemented"),
+             ("4", "Demo", "Gradio, runs on one Colab T4", "Akif · demo lead · interface", "text input works")]
     x = 0.55
     for i, (n, head, tool, who, status) in enumerate(steps):
         own = n == "2"
@@ -249,7 +249,7 @@ def s3_data(prs, ev, asr):
 
 
 def s4_asr(prs, asr):
-    s = base(prs, "STEP 1  ·  SPEECH → TEXT  (ALP)", "Who spoke when: WhisperX + pyannote")
+    s = base(prs, "STEP 1  ·  SPEECH → TEXT", "Who spoke when: WhisperX + pyannote")
     stat(s, 0.55, 1.6, "93.8%", f"speaker accuracy, {asr['correct']:,} / {asr['total']:,}\nutterances, 20 PriMock57 consultations")
     stat(s, 3.65, 1.6, "96.7%", "on utterances longer\nthan 1 second")
     stat(s, 6.75, 1.6, "87.8%", "on short utterances\n(< 1 s)")
@@ -362,7 +362,7 @@ def s7_errors(prs, ev):
 
 
 def s9_experiment(prs, rouge):
-    s = base(prs, "METHOD STATUS  ·  FIRST NUMBERS ON DEV (ALI)", "With roles vs without: same model, same prompt")
+    s = base(prs, "METHOD STATUS  ·  FIRST NUMBERS ON DEV", "With roles vs without: same model, same prompt")
     rows = [["ROUGE vs reference note", "R-1", "R-2", "R-L"]]
     for cond, name in (("rolsuz", "Without labels (baseline)"), ("rollu", "With Doctor/Patient labels")):
         rows.append([name] + [f"{rmean(rouge, cond, m):.3f}" for m in ("rouge1", "rouge2", "rougeL")])
@@ -393,18 +393,18 @@ def s9_experiment(prs, rouge):
              "longest dialogue. ROUGE cannot see these errors, so the final uses error counts too.")
 
 
-PLAN = [("Run with/without labels on the 40 frozen test dialogues; ROUGE + BERTScore", "Ali", "Nov 26"),
-        ("Ablation: anonymous A/B labels (turns, no roles) as a 3rd condition", "Ali", "Nov 26"),
-        ("Attribution-error checklist; 2 people label 10 notes for agreement", "Akif + Ali", "Dec 3"),
-        ("BERT role classifier vs TF-IDF on the same frozen test", "Yusuf", "Nov 26"),
-        ("Hand-check 30 utterance errors; roles on diarized ASR output", "Yusuf + Alp", "Dec 3"),
-        ("Predicted vs gold roles into the note (error propagation)", "Alp + Ali", "Dec 10"),
-        ("Audio input in the demo; report skeleton", "Akif", "Dec 10")]
+PLAN = [("Run with/without labels on the 40 frozen test dialogues; ROUGE + BERTScore", "Notes lead", "Nov 26"),
+        ("Ablation: anonymous A/B labels (turns, no roles) as a 3rd condition", "Notes lead", "Nov 26"),
+        ("Attribution-error checklist; 2 people label 10 notes for agreement", "Demo + notes", "Dec 3"),
+        ("BERT role classifier vs TF-IDF on the same frozen test", "Roles lead", "Nov 26"),
+        ("Hand-check 30 utterance errors; roles on diarized ASR output", "Roles + ASR", "Dec 3"),
+        ("Predicted vs gold roles into the note (error propagation)", "ASR + notes", "Dec 10"),
+        ("Audio input in the demo; report skeleton", "Demo lead", "Dec 10")]
 
 
 def s10_plan(prs):
     s = base(prs, "PLAN TO THE FINAL", "Remaining experiments, owners and dates")
-    table(s, 0.55, 1.6, [6.4, 1.5, 1.2], [["Experiment", "Owner", "Date"]] + [list(p) for p in PLAN],
+    table(s, 0.55, 1.6, [6.0, 1.9, 1.2], [["Experiment", "Owner", "Date"]] + [list(p) for p in PLAN],
           row_h=0.5, size=11.5)
     card(s, 9.95, 1.6, 2.8, 2.45, fill=INK)
     tb = textbox(s, 10.1, 1.72, 2.55, 2.25)
@@ -489,7 +489,7 @@ def project_card(prs, ev, cv, asr, rouge):
             f"{ev['counts']['dev']['utterances']:,}; test (clinicalnlp_taskB_test1, frozen) "
             f"{ev['counts']['test']['encounters']} / {ev['counts']['test']['utterances']:,}.",
             "Preprocessing: [patient_guest] lines dropped (dev 38, test 50); encounters unchanged.",
-            f"PriMock57 (licence: not decided yet — to check): 20 consultations, first 5 min, {asr['total']:,} "
+            f"PriMock57, CC BY 4.0: 20 consultations, first 5 min, {asr['total']:,} "
             "utterances. Example: [doctor] have you … noticed any rashes? / [patient] on my body no not really.",
             "No data labelled by us yet; the attribution-error checklist will report agreement on 10 notes."]),
     ])
@@ -520,7 +520,7 @@ def project_card(prs, ev, cv, asr, rouge):
             "; ".join(f"{c.split(' (')[0]} {n}" for c, n in ev["utterance_errors_test"]["by_category"].items()) +
             ". Example: “okay.” (short backchannel). Notes: 1 echo, 1 negation-scope, 1 number, 1 added fact (6 notes)."]),
         (10, "Research lead section", 1.35, [
-            "Research lead: not decided yet. Two recent papers: ACI-BENCH (Yim et al. 2023) and MEDIQA-Chat 2023 "
+            "Research lead: the notes and experiment lead (slide 2), who owns the research question. Two recent papers: ACI-BENCH (Yim et al. 2023) and MEDIQA-Chat 2023 "
             "(Ben Abacha et al.); both report note quality without isolating speaker labels. We run the "
             "ablation no-speaker / anonymous A/B / roles."]),
         (11, "Plan and risk", 1.4, [
@@ -530,10 +530,35 @@ def project_card(prs, ev, cv, asr, rouge):
             f"Repo: {REPO}.  Field 8: python -m eval.role_eval (roles) and python -m notes.generate_note "
             "--experiment (notes, needs GPU). Seeds: bootstrap 0, LLM temperature 0. Versions: Python 3.12, "
             "scikit-learn ≥1.4, transformers + bitsandbytes (Colab), WhisperX.",
-            "Who did what: Alp ASR; Yusuf roles; Ali notes and experiment; Akif shared format, demo, evaluation "
-            "and slides. AI tools: Claude (Anthropic) for planning, code scaffolding and slide drafts; all "
-            "outputs checked by the team."]),
+            "Who did what: one module per member, as on slide 2 — ASR lead: speech → text; roles lead: role "
+            "classifier; notes lead: notes and experiment; demo lead: shared format, demo, evaluation, slides. "
+            "AI tools: Claude (Anthropic) for planning, code scaffolding, evaluation scripts and slide drafts; "
+            "all outputs checked by the team."]),
     ])
+
+
+NAMES = re.compile(r"(,\s*)?\b(Akif|Alp|Yusuf|Ali)\b")
+SWAP = {"PERSON 2": "STEP 2", "PERSON 3": "STEP 3", "Person 2 · ": "", "Person 3 · ": ""}
+
+
+def strip_names(prs):
+    """Names stay on slides 1-2 only (team decision); later slides use module roles."""
+    for i, s in enumerate(prs.slides):
+        if s.has_notes_slide:
+            tf = s.notes_slide.notes_text_frame
+            tf.text = NAMES.sub("", tf.text)
+        if i < 2:
+            continue
+        for sh in s.shapes:
+            if not sh.has_text_frame:
+                continue
+            for p in sh.text_frame.paragraphs:
+                for r in p.runs:
+                    t = r.text
+                    for a, b in SWAP.items():
+                        t = t.replace(a, b)
+                    r.text = t
+                    assert not NAMES.search(t), f"name left on slide {i + 1}: {t}"
 
 
 def main():
@@ -551,6 +576,7 @@ def main():
     s9_experiment(prs, rouge)
     s10_plan(prs)
     project_card(prs, ev, cv, asr, rouge)
+    strip_names(prs)
     out = R("results", "medscribe_midproject.pptx")
     prs.save(out)
     print("->", out, len(prs.slides._sldIdLst), "slides")
